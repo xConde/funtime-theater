@@ -1,8 +1,14 @@
 # Funtime Theater
 
+![Funtime Theater's Now Showing screen](docs/images/now-showing.webp)
+
 A seat-finding arcade game set in a B-movie theater. Choose a show, catch the lit seat, and use your ticket earnings at the concession stand.
 
 Originally part of [edconde.com](https://edconde.com); this is the standalone game. The lobby art, seat play, sounds, progression, and save data run in the browser. No account or server is involved.
+
+Once the lights go down, find the lit seat before the countdown ends:
+
+![The Funtime Theater seat-finding game](docs/images/seat-game.webp)
 
 ## Run locally
 
