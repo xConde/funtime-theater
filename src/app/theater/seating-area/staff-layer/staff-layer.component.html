@@ -1,0 +1,70 @@
+<!-- Staff Layer: absolute overlay over seating area. pointer-events: none on host. -->
+
+<!-- Spotlight beam (magneticField) -->
+@if (showSpotlight()) {
+  <div class="spotlight-beam" [style.transform]="'rotate(' + spotlightAngle() + 'deg)'"></div>
+}
+
+<!-- Box office booth (passiveIncome) -->
+@if (showBoxOffice()) {
+  <div class="box-office" [class.glow]="boxOfficeGlow()">
+    <div class="box-office__awning"></div>
+    <div class="box-office__body">
+      <div class="box-office__window"></div>
+    </div>
+  </div>
+}
+
+<!-- Popcorn cart (ticketMultiplier) -->
+@if (showPopcornCart()) {
+  <div class="popcorn-cart" [style.--cart-glow]="cartGlowLevel()">
+    <div class="popcorn-cart__body">
+      <div class="popcorn-cart__top"></div>
+    </div>
+    <div class="popcorn-cart__wheel popcorn-cart__wheel--left"></div>
+    <div class="popcorn-cart__wheel popcorn-cart__wheel--right"></div>
+  </div>
+}
+
+<!-- Usher (autoClicker) -->
+@if (showUsher()) {
+  <div
+    class="usher"
+    [class.usher--dashing]="usherState() === 'dashing'"
+    [class.usher--returning]="usherState() === 'returning'"
+    [style.--dash-fraction]="usherDashFraction()"
+  >
+    <div class="usher__figure">
+      <div class="usher__cap"></div>
+      <div class="usher__head"></div>
+      <div class="usher__body"></div>
+      <div
+        class="usher__flashlight"
+        [class.usher__flashlight--left]="usherFlashSide() === 'left'"
+        [class.usher__flashlight--right]="usherFlashSide() === 'right'"
+      ></div>
+    </div>
+    @if (usherFlashVisible()) {
+      <div
+        class="usher__cone"
+        [class.usher__cone--left]="usherFlashSide() === 'left'"
+        [class.usher__cone--right]="usherFlashSide() === 'right'"
+      ></div>
+    }
+  </div>
+}
+
+<!-- Confetti cannons (ticketStorm) -->
+@if (showConfettiCannons()) {
+  <div class="cannon cannon--left" [class.cannon--firing]="confettiFiring()">
+    <div class="cannon__barrel"></div>
+  </div>
+  <div class="cannon cannon--right" [class.cannon--firing]="confettiFiring()">
+    <div class="cannon__barrel"></div>
+  </div>
+  @if (confettiFiring()) {
+    @for (i of confettiParticles; track i) {
+      <div class="confetti confetti--{{ i }}"></div>
+    }
+  }
+}

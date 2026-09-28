@@ -1,0 +1,506 @@
+// Staff Layer — absolute overlay inside seating-area.
+// pointer-events: none is set on the host in the component decorator.
+
+:host {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 50;
+}
+
+// ============================================================
+// SPOTLIGHT BEAM (magneticField)
+// ============================================================
+
+.spotlight-beam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform-origin: top center;
+  width: 0;
+  height: 0;
+  // CSS gradient triangle pointing downward
+  border-left: 56px solid transparent;
+  border-right: 56px solid transparent;
+  border-top: none;
+  // Use a pseudo-element for the actual gradient cone
+  pointer-events: none;
+  transition: transform 0.6s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -84px;
+    width: 168px;
+    height: 85%;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 240, 160, 0.18) 0%,
+      rgba(255, 240, 160, 0.06) 60%,
+      transparent 100%
+    );
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    pointer-events: none;
+    transform-origin: top center;
+  }
+}
+
+// ============================================================
+// BOX OFFICE (passiveIncome)
+// ============================================================
+
+.box-office {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 0.5rem;
+  width: 4rem;
+  pointer-events: none;
+
+  &__awning {
+    height: 0.9rem;
+    border-radius: 3px 3px 0 0;
+    background: repeating-linear-gradient(90deg, #8b1a1a 0px, #8b1a1a 4px, #f5e6c8 4px, #f5e6c8 8px);
+  }
+
+  &__body {
+    background: #3a2a1a;
+    border-radius: 0 0 3px 3px;
+    padding: 0.34rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 2.3rem;
+  }
+
+  &__window {
+    width: 1.7rem;
+    height: 1.25rem;
+    background: rgba(255, 220, 120, 0.35);
+    border-radius: 2px;
+    border: 1px solid rgba(255, 200, 80, 0.5);
+    transition:
+      background 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  &.glow &__window {
+    background: rgba(255, 220, 120, 0.85);
+    box-shadow: 0 0 6px 3px rgba(255, 200, 80, 0.55);
+  }
+}
+
+// ============================================================
+// POPCORN CART (ticketMultiplier)
+// ============================================================
+
+.popcorn-cart {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 0.5rem;
+  width: 3.7rem;
+  pointer-events: none;
+
+  --cart-glow: 1;
+
+  &__body {
+    background: #b03a2e;
+    border-radius: 4px 4px 2px 2px;
+    height: 2.3rem;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 0.1rem;
+    // Glow stepped by ownership level
+    box-shadow: 0 0 calc(var(--cart-glow) * 3px) calc(var(--cart-glow) * 1px) rgba(255, 160, 50, 0.4);
+  }
+
+  &__top {
+    width: 2rem;
+    height: 0.9rem;
+    background: #f5e6c8;
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  }
+
+  &__wheel {
+    position: absolute;
+    bottom: -0.5rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: #4a3728;
+    border: 1px solid #2a1a0a;
+
+    &--left {
+      left: 0.35rem;
+    }
+    &--right {
+      right: 0.35rem;
+    }
+  }
+}
+
+// ============================================================
+// USHER (autoClicker)
+// ============================================================
+
+.usher {
+  position: absolute;
+  // By default sits near the entry (bottom center-ish, just right of stairs)
+  bottom: 1.6rem;
+  left: calc(50% + 1.5rem);
+  width: 3rem;
+  pointer-events: none;
+
+  // The --dash-fraction controls how far up the seating area the usher goes.
+  // translateY(-X%) moves element upward; we approximate seating area height
+  // using a percentage relative to the overlay itself.
+  &--dashing {
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(calc(var(--dash-fraction, 0) * -80%));
+  }
+
+  &--returning {
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(0%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &--dashing,
+    &--returning {
+      transition: none;
+    }
+  }
+}
+
+.usher__figure {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  // Idle sway animation
+  animation: usher-sway 2s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.usher__cap {
+  width: 1.9rem;
+  height: 0.5rem;
+  background: #1a1a2e;
+  border-radius: 2px;
+  position: relative;
+  z-index: 1;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 10%;
+    width: 80%;
+    height: 0.4rem;
+    background: #1a1a2e;
+    border-radius: 2px 2px 0 0;
+  }
+}
+
+.usher__head {
+  width: 1.45rem;
+  height: 1.45rem;
+  border-radius: 50%;
+  background: #c49a6c;
+  margin-top: 0.08rem;
+}
+
+.usher__body {
+  width: 1.9rem;
+  height: 1.9rem;
+  background: #1a1a2e;
+  border-radius: 4px 4px 0 0;
+  margin-top: 0.08rem;
+  position: relative;
+
+  // Gold accent stripe
+  &::after {
+    content: '';
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    top: 20%;
+    height: 60%;
+    background: #c9a84c;
+    border-radius: 1px;
+  }
+}
+
+.usher__flashlight {
+  position: absolute;
+  bottom: 0.17rem;
+  width: 1rem;
+  height: 0.34rem;
+  background: #888;
+  border-radius: 2px;
+
+  &--left {
+    right: -0.34rem;
+    transform: rotate(20deg);
+  }
+  &--right {
+    left: -0.34rem;
+    transform: rotate(-20deg);
+  }
+}
+
+.usher__cone {
+  position: absolute;
+  top: 0.85rem;
+  width: 0;
+  height: 0;
+  animation: cone-pulse 0.6s ease-out;
+  pointer-events: none;
+
+  &--left {
+    right: -0.85rem;
+    border-top: 0.85rem solid transparent;
+    border-bottom: 0.85rem solid transparent;
+    border-left: 2rem solid rgba(255, 240, 120, 0.55);
+  }
+
+  &--right {
+    left: -0.85rem;
+    border-top: 0.85rem solid transparent;
+    border-bottom: 0.85rem solid transparent;
+    border-right: 2rem solid rgba(255, 240, 120, 0.55);
+  }
+}
+
+@keyframes usher-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes cone-pulse {
+  0% {
+    opacity: 0.8;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+// ============================================================
+// CONFETTI CANNONS (ticketStorm)
+// ============================================================
+
+.cannon {
+  position: absolute;
+  bottom: 1.5rem;
+  width: 2rem;
+  height: 0.9rem;
+  background: #2a2a3e;
+  border-radius: 3px;
+  pointer-events: none;
+
+  &--left {
+    left: 0.5rem;
+    transform: rotate(-30deg);
+    transform-origin: right center;
+  }
+
+  &--right {
+    right: 0.5rem;
+    transform: rotate(30deg);
+    transform-origin: left center;
+  }
+
+  &__barrel {
+    position: absolute;
+    right: -0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0.75rem;
+    height: 0.6rem;
+    background: #3a3a5e;
+    border-radius: 2px;
+  }
+}
+
+.cannon--left.cannon--firing {
+  animation: cannon-recoil-left 0.2s ease-out;
+}
+
+.cannon--right.cannon--firing {
+  animation: cannon-recoil-right 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cannon--left.cannon--firing,
+  .cannon--right.cannon--firing {
+    animation: none;
+  }
+}
+
+@keyframes cannon-recoil-left {
+  0% {
+    transform: rotate(-30deg) translateX(0);
+  }
+  40% {
+    transform: rotate(-30deg) translateX(4px);
+  }
+  100% {
+    transform: rotate(-30deg) translateX(0);
+  }
+}
+
+@keyframes cannon-recoil-right {
+  0% {
+    transform: rotate(30deg) translateX(0);
+  }
+  40% {
+    transform: rotate(30deg) translateX(-4px);
+  }
+  100% {
+    transform: rotate(30deg) translateX(0);
+  }
+}
+
+// Confetti particles — pre-allocated, animated by class toggle
+
+@mixin confetti-particle($x, $rot, $color, $delay) {
+  position: absolute;
+  bottom: 2.6rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: $color;
+  border-radius: 1px;
+  animation: confetti-fly 0.7s ease-out #{$delay} both;
+  transform-origin: center center;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    opacity: 0;
+  }
+
+  @keyframes confetti-fly {
+    0% {
+      transform: translate(0, 0) rotate(0deg);
+      opacity: 1;
+    }
+    80% {
+      opacity: 0.8;
+    }
+    100% {
+      transform: translate(#{$x}, -5rem) rotate(#{$rot});
+      opacity: 0;
+    }
+  }
+}
+
+// Left-side cannon particles
+.confetti--0 {
+  left: 0.6rem;
+  @include confetti-particle(-0.4rem, 120deg, #e63946, 0ms);
+}
+.confetti--1 {
+  left: 0.9rem;
+  @include confetti-particle(0.2rem, 200deg, #f4d35e, 80ms);
+}
+.confetti--2 {
+  left: 0.5rem;
+  @include confetti-particle(-0.8rem, 300deg, #06d6a0, 150ms);
+}
+// Right-side cannon particles
+.confetti--3 {
+  right: 0.6rem;
+  @include confetti-particle(0.4rem, -120deg, #118ab2, 30ms);
+}
+.confetti--4 {
+  right: 0.9rem;
+  @include confetti-particle(-0.2rem, -200deg, #ffd166, 110ms);
+}
+.confetti--5 {
+  right: 0.5rem;
+  @include confetti-particle(0.8rem, -300deg, #ef476f, 180ms);
+}
+
+// ============================================================
+// LIGHT MODE (DAY MODE) SUPPORT
+// ============================================================
+
+:host-context(.day-mode) {
+  .box-office {
+    &__awning {
+      background: repeating-linear-gradient(90deg, #9b2226 0px, #9b2226 4px, #f8eddc 4px, #f8eddc 8px);
+    }
+
+    &__body {
+      background: #5c3d2e;
+    }
+
+    &__window {
+      background: rgba(255, 210, 100, 0.3);
+      border-color: rgba(210, 160, 50, 0.5);
+    }
+
+    &.glow &__window {
+      background: rgba(255, 210, 100, 0.9);
+      box-shadow: 0 0 6px 3px rgba(210, 160, 50, 0.5);
+    }
+  }
+
+  .popcorn-cart {
+    &__body {
+      background: #922b21;
+    }
+    &__top {
+      background: #f8eddc;
+    }
+    &__wheel {
+      background: #6b4423;
+      border-color: #3a200e;
+    }
+  }
+
+  .usher__cap {
+    background: #2c1a4e;
+    &::after {
+      background: #2c1a4e;
+    }
+  }
+  .usher__body {
+    background: #2c1a4e;
+    &::after {
+      background: #b8860b;
+    }
+  }
+
+  .cannon {
+    background: #3a2a1a;
+    &__barrel {
+      background: #5a4a2e;
+    }
+  }
+
+  .spotlight-beam::after {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 230, 120, 0.14) 0%,
+      rgba(255, 230, 120, 0.04) 60%,
+      transparent 100%
+    );
+  }
+}

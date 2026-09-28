@@ -1,0 +1,135 @@
+// attract-screen.component.scss
+// Uses lobby design system tokens via lobby-variables
+@use '../lobby-variables' as *;
+
+.attract-screen {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-sm;
+  padding: $space-sm 0 $space-md;
+  box-sizing: border-box;
+}
+
+// ─── Plaque ──────────────────────────────────────────────────────────────────
+
+.attract-plaque {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-xs;
+}
+
+.attract-eyebrow {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  color: $color-gold;
+  text-shadow: 1px 1px 0 #8b4513;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.attract-title {
+  font-family: 'Arial Black', sans-serif;
+  font-size: clamp(0.9rem, 2.5vw, 1.25rem);
+  font-weight: 900;
+  color: $color-gold;
+  @include gold-text-shadow;
+  margin: 0;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.attract-tagline {
+  font-family: Arial, sans-serif;
+  font-size: clamp(0.65rem, 1.5vw, 0.8rem);
+  color: rgba(255, 215, 0, 0.7);
+  margin: 0;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+// ─── Cinema Frame ─────────────────────────────────────────────────────────────
+
+.attract-frame {
+  width: 100%;
+  max-width: 720px;
+  background: #0a0804;
+  border-radius: 4px;
+  border: 1px solid rgba(184, 134, 11, 0.55);
+  box-shadow:
+    0 0 12px rgba(184, 134, 11, 0.22),
+    0 0 3px rgba(255, 215, 0, 0.08) inset;
+  padding: 3px;
+  box-sizing: border-box;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 2px;
+  }
+}
+
+// ─── Credits ─────────────────────────────────────────────────────────────────
+
+.attract-credits {
+  font-family: Arial, sans-serif;
+  font-size: clamp(0.6rem, 1.2vw, 0.72rem);
+  color: rgba(255, 215, 0, 0.5);
+  margin: 0;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.attract-eyebrow--intermission {
+  color: #ffd24a;
+  animation: intermissionPulse 1.6s ease-in-out infinite;
+}
+
+// Gold is a useful marquee accent against the night lobby, but it disappears
+// into the paper-colored day theme. Keep the same warm palette with real ink
+// values when the lobby is light.
+:host-context(.day-mode) {
+  .attract-eyebrow {
+    color: #71502c;
+    text-shadow: none;
+    opacity: 1;
+  }
+
+  .attract-title {
+    color: #613117;
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.45);
+  }
+
+  .attract-tagline {
+    color: #665648;
+  }
+
+  .attract-credits {
+    color: #725f4d;
+  }
+
+  .attract-eyebrow--intermission {
+    color: #7a421f;
+  }
+}
+
+@keyframes intermissionPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attract-eyebrow--intermission {
+    animation: none;
+  }
+}

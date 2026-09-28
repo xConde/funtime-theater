@@ -1,0 +1,447 @@
+// Theater Design System
+// Direction: Vintage 1950s movie theater with warm, nostalgic feel
+// Philosophy: Immersive theater experience with gold accents and classic cinema charm
+
+@use 'sass:color';
+
+// =============================================================================
+// 4px Grid System - All spacing follows this strictly
+// =============================================================================
+$grid-unit: 4px;
+$spacing-micro: $grid-unit; // 4px - icon gaps, hairline spacing
+$spacing-tight: $grid-unit * 2; // 8px - within components
+$spacing-standard: $grid-unit * 3; // 12px - between related elements
+$spacing-comfortable: $grid-unit * 4; // 16px - section padding
+$spacing-generous: $grid-unit * 6; // 24px - between sections
+$spacing-major: $grid-unit * 8; // 32px - major separation
+$spacing-xlarge: $grid-unit * 12; // 48px - large gaps
+
+// =============================================================================
+// Typography System
+// =============================================================================
+$font-display: 'Arial Black', 'Bebas Neue', Impact, sans-serif; // Marquee titles
+$font-body: Arial, 'Helvetica Neue', sans-serif; // Primary text
+$font-system: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-mono: 'SF Mono', Monaco, 'Cascadia Code', monospace; // Data display
+
+// Type Scale (4px grid influence)
+$text-micro: 11px; // Labels, metadata
+$text-small: 12px; // Secondary text
+$text-base: 14px; // Body text
+$text-medium: 16px; // Subheadings
+$text-large: 20px; // Section titles
+$text-xlarge: 24px; // Page headers
+$text-display: 32px; // Marquee titles
+
+// Type Weights
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 700;
+$weight-black: 900;
+
+// =============================================================================
+// Border Radius System - Vintage rounded aesthetic
+// =============================================================================
+$radius-none: 0;
+$radius-small: 4px; // Badges, small controls
+$radius-base: 8px; // Standard elements
+$radius-medium: 12px; // Cards, panels
+$radius-large: 16px; // Modals, overlays
+$radius-xlarge: 20px; // Large decorative elements
+$radius-pill: 9999px; // Round buttons, theater lights
+
+// =============================================================================
+// Color System - Theater palette
+// =============================================================================
+// Primary colors
+$color-gold: #ffd700;
+$color-gold-dark: #b8860b;
+$color-brown: #8b4513;
+$color-brown-dark: #654321;
+
+// Gold opacity variants
+$color-gold-60: rgba(255, 215, 0, 0.6);
+$color-gold-30: rgba(255, 215, 0, 0.3);
+$color-gold-15: rgba(255, 215, 0, 0.15);
+$color-gold-10: rgba(255, 215, 0, 0.1);
+
+// Semantic colors
+$color-success: #00d632;
+$color-success-muted: #2e7d32;
+$color-error: #c62828;
+$color-warning: #f9a825;
+
+// Dark mode surfaces
+$surface-dark: #141414;
+$surface-dark-elevated: #1a1a1a;
+$surface-dark-card: #2a2424;
+$surface-dark-card-hover: #3a3030;
+
+// Light mode surfaces (warm matinee palette)
+$surface-light: #f0ede8;
+$surface-light-warm: #fef9f3;
+$surface-light-card: rgba(255, 255, 255, 0.95);
+$surface-light-overlay: rgba(250, 248, 243, 0.98);
+
+// Light mode text - warm brown palette (espresso/walnut tones)
+$color-light-text: #4e342e; // Espresso - primary text
+$color-light-text-secondary: #6d4c41; // Walnut - secondary text
+$color-light-muted: rgba(78, 52, 46, 0.7); // Muted espresso
+
+// Light mode accents
+$color-light-amber: #b7950b; // Warm amber (gold replacement)
+$color-light-amber-dark: #9a7b0a; // Darker amber
+$color-light-burgundy: #a93226; // Burgundy accent (curtains)
+$color-light-burgundy-dark: #922b21; // Critical states
+
+// Light mode borders - warm brown tones
+$color-light-border: rgba(109, 76, 65, 0.15);
+$color-light-border-strong: rgba(109, 76, 65, 0.25);
+$color-light-border-accent: rgba(109, 76, 65, 0.3);
+
+// =============================================================================
+// CSS Custom Properties - Theme-aware (use in component stylesheets)
+// =============================================================================
+// These mixins should be included in component :host blocks, not used directly
+// in shared partials. Use SCSS variables ($color-gold, etc.) for direct styling.
+
+@mixin theme-variables-dark {
+  // Theater gold accents
+  --theater-gold: #{$color-gold};
+  --theater-gold-dark: #{$color-gold-dark};
+  --theater-brown: #{$color-brown};
+  --theater-brown-dark: #{$color-brown-dark};
+
+  // Semantic
+  --theater-success: #{$color-success};
+  --theater-error: #{$color-error};
+
+  // Surfaces (dark mode default)
+  --theater-surface: #{$surface-dark-card};
+  --theater-surface-hover: #{$surface-dark-card-hover};
+  --theater-border: #{$color-gold-30};
+  --theater-border-strong: #{$color-gold-60};
+
+  // Text
+  --theater-text: #ffffff;
+  --theater-text-muted: rgba(255, 255, 255, 0.7);
+  --theater-text-gold: #{$color-gold};
+}
+
+@mixin theme-variables-light {
+  --theater-gold: #{$color-light-amber};
+  --theater-gold-dark: #{$color-light-amber-dark};
+  --theater-brown: #{$color-light-text};
+
+  --theater-success: #{$color-success-muted};
+  --theater-error: #{$color-light-burgundy-dark};
+  --theater-surface: #{$surface-light-card};
+  --theater-surface-hover: #{$surface-light-warm};
+  --theater-border: #{$color-light-border};
+  --theater-border-strong: #{$color-light-border-strong};
+
+  --theater-text: #{$color-light-text};
+  --theater-text-secondary: #{$color-light-text-secondary};
+  --theater-text-muted: #{$color-light-muted};
+  --theater-text-gold: #{$color-light-text-secondary};
+}
+
+// =============================================================================
+// Animation System
+// =============================================================================
+$animation-fast: 150ms;
+$animation-standard: 200ms;
+$animation-medium: 300ms;
+$animation-slow: 500ms;
+$animation-loop: 2s;
+$animation-loop-slow: 3s;
+
+// Easing curves
+$easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+$easing-out: cubic-bezier(0.25, 1, 0.5, 1);
+$easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+$easing-theater: ease-in-out; // Classic theater feel
+
+// =============================================================================
+// Responsive Breakpoints
+// =============================================================================
+$breakpoint-small-mobile: 480px;
+$breakpoint-mobile: 768px;
+$breakpoint-tablet: 900px;
+$breakpoint-desktop: 1200px;
+
+// =============================================================================
+// Depth Strategy: Vintage Theater (Shadows + Borders + Glow)
+// Theater aesthetic uses shadows for depth unlike minimalist projects
+// =============================================================================
+
+// Box shadows - vintage inset + drop shadow combo
+@mixin depth-shadow-card {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+@mixin depth-shadow-card-hover {
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 8px 24px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(184, 160, 112, 0.15);
+}
+
+@mixin depth-shadow-elevated {
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.4),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+@mixin depth-shadow-glow-gold {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+}
+
+@mixin depth-shadow-glow-success {
+  box-shadow: 0 0 15px rgba(0, 214, 50, 0.3);
+}
+
+// Light mode shadows (subtle, no vintage effect)
+@mixin depth-shadow-light {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+@mixin depth-shadow-light-hover {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+// Text shadows - marquee/cinema style
+@mixin text-shadow-gold {
+  text-shadow: 2px 2px 0 $color-brown;
+}
+
+@mixin text-shadow-gold-large {
+  text-shadow:
+    3px 3px 0 $color-brown,
+    4px 4px 0 $color-brown-dark,
+    5px 5px 10px rgba(0, 0, 0, 0.8);
+}
+
+@mixin text-shadow-gold-glow {
+  text-shadow:
+    2px 2px 0 $color-brown,
+    0 0 30px rgba(255, 215, 0, 0.4);
+}
+
+// Border mixins
+@mixin border-standard {
+  border: 2px solid var(--theater-border);
+}
+
+@mixin border-strong {
+  border: 3px solid var(--theater-border-strong);
+}
+
+@mixin border-gold {
+  border: 2px solid $color-gold;
+}
+
+@mixin border-gold-glow {
+  border: 2px solid $color-gold;
+  box-shadow: 0 0 10px $color-gold-30;
+}
+
+// =============================================================================
+// Component Mixins
+// =============================================================================
+
+// Vintage card (dark mode)
+@mixin card-vintage {
+  background: $surface-dark-card;
+  border: 3px solid $surface-dark-card-hover;
+  border-radius: $radius-large;
+  @include depth-shadow-card;
+  transition: all $animation-medium $easing-bounce;
+}
+
+@mixin card-vintage-hover {
+  transform: translateY(-3%) scale(1.02);
+  @include depth-shadow-card-hover;
+  z-index: 10;
+}
+
+// Panel base
+@mixin panel-base {
+  @include border-standard;
+  border-radius: $radius-medium;
+  background: var(--theater-surface);
+  overflow: hidden;
+}
+
+// Button base
+@mixin button-base {
+  padding: $spacing-tight $spacing-comfortable;
+  font-size: $text-base;
+  font-weight: $weight-semibold;
+  border-radius: $radius-base;
+  cursor: pointer;
+  transition: all $animation-standard $easing-standard;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-gold {
+  @include button-base;
+  background: linear-gradient(135deg, $color-gold, $color-gold-dark);
+  border: 2px solid $color-gold;
+  color: $color-brown-dark;
+  @include text-shadow-gold;
+
+  &:hover:not(:disabled) {
+    @include depth-shadow-glow-gold;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin button-success {
+  @include button-base;
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.2), rgba(46, 125, 50, 0.15));
+  border: 3px solid rgba(46, 125, 50, 0.5);
+  color: $color-success-muted;
+
+  &:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.3), rgba(46, 125, 50, 0.25));
+    border-color: $color-success-muted;
+  }
+}
+
+// =============================================================================
+// Layout Mixins
+// =============================================================================
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin grid-responsive($mobile: 2, $tablet: 3, $desktop: 4) {
+  display: grid;
+  grid-template-columns: repeat($mobile, minmax(0, 1fr));
+  gap: $spacing-standard;
+
+  @media (min-width: $breakpoint-mobile) {
+    grid-template-columns: repeat($tablet, minmax(0, 1fr));
+  }
+
+  @media (min-width: $breakpoint-desktop) {
+    grid-template-columns: repeat($desktop, minmax(0, 1fr));
+  }
+}
+
+// =============================================================================
+// Text Utilities
+// =============================================================================
+@mixin text-data {
+  font-family: $font-mono;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@mixin text-marquee {
+  font-family: $font-display;
+  font-weight: $weight-black;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// =============================================================================
+// Focus States (Accessibility)
+// =============================================================================
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--bg-color, #141414),
+      0 0 0 4px $color-gold;
+  }
+}
+
+@mixin focus-ring-light {
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px $surface-light,
+      0 0 0 4px $color-light-brown;
+  }
+}
+
+// =============================================================================
+// Reduced Motion Support
+// =============================================================================
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// =============================================================================
+// Scrollbar Styling
+// =============================================================================
+@mixin scrollbar-dark {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: $radius-small;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $color-gold-30;
+    border-radius: $radius-small;
+
+    &:hover {
+      background: $color-gold-60;
+    }
+  }
+}
+
+@mixin scrollbar-light {
+  &::-webkit-scrollbar-track {
+    background: rgba(109, 76, 65, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(109, 76, 65, 0.2);
+    border: 1px solid $color-light-border;
+
+    &:hover {
+      background: rgba(109, 76, 65, 0.3);
+    }
+  }
+}

@@ -1,0 +1,243 @@
+<div class="screen-container">
+  <div
+    class="screen"
+    [ngClass]="[
+      isLoading ? 'spinner-container' : '',
+      isGameActive ? 'game-active' : '',
+      isGamePaused ? 'paused' : '',
+      isGameEnded ? 'game-ended' : '',
+      isGameStarting ? 'game-starting' : '',
+      currentPulseClass,
+      pulseAnimationClass,
+    ]"
+  >
+    <!-- Idle screen - minimal. During the ~500ms resume-from-lobby wait this only
+         renders when gameState already started Inactive (the checkpoint survived
+         a route remount) or the resume attempt fails; the common same-route
+         Paused -> Resume path keeps gameState Paused the whole wait and never
+         reaches this. Do not "fix" this as unreachable or always-visible. -->
+    @if (!isGameActive && !isGamePaused && !isGameEnded && !isGameStarting) {
+      <div class="idle-screen">
+        <span class="idle-screen__caption">Cueing the Reel</span>
+      </div>
+    }
+
+    <!-- Film layer: sits behind all HUD elements (z-index 1). Hidden when no film. -->
+    @if (filmShowtime.currentFilm(); as film) {
+      <div class="film-layer">
+        <!-- The projection itself: lo-fi procedural scene for the current beat -->
+        <!-- Buffer dimensions are set imperatively to track the panel's aspect
+             ratio (see ScreenComponent.sizeCanvasToPanel); height is fixed. -->
+        <canvas #filmCanvas class="film-canvas" aria-hidden="true"></canvas>
+        <!-- Genre tint glow -->
+        <div class="film-glow"></div>
+        <!-- Intensity flicker: animation runs only when intensity > 0.4 -->
+        <div class="film-flicker" [class.flicker-active]="isFlickerActive()"></div>
+
+        @let beat = filmShowtime.currentBeat();
+
+        <!-- Title card: waits for the countdown leader to finish -->
+        @if (isTitleCardVisible()) {
+          <div class="film-title-card">
+            <span class="film-title-text">{{ film.title }}</span>
+            <span class="film-starring-line">starring {{ film.starring }}</span>
+            <span class="film-year">{{ film.year }}</span>
+          </div>
+        }
+
+        <!-- Body beat caption -->
+        @if (beat && beat.kind !== 'title-card' && beat.kind !== 'credits') {
+          <div class="film-caption">
+            <span class="film-caption-text">{{ beat.label }}</span>
+          </div>
+        }
+
+        <!-- Credits -->
+        @if (beat?.kind === 'credits') {
+          <div class="film-credits">
+            <span class="film-the-end">The End</span>
+            <div class="film-credits-scroll">
+              <span class="film-credits-line credit-title">{{ film.title }}</span>
+              <span class="film-credits-line">starring {{ film.starring }}</span>
+              <span class="film-credits-line">directed by {{ film.directedBy }}</span>
+              <span class="film-credits-line">{{ film.year }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Feature number badge (shown from 2nd feature onward) -->
+        @if (filmShowtime.featureNumber() > 1) {
+          <div class="film-feature-badge">{{ ordinalLabel(filmShowtime.featureNumber()) }} Feature</div>
+        }
+      </div>
+    }
+
+    <!-- The countdown leader on the film canvas is the intro now; the old
+         mode announcement card was a redundant second curtain-raiser. -->
+
+    @switch (gameService.gameState()) {
+      <!-- Inactive -->
+      @case (GameState.Inactive) {
+        <!-- Movie background is shown instead of spinner -->
+      }
+
+      <!-- Starting: a short house-rules card replaces the old dead-black wait. -->
+      @case (GameState.Starting) {
+        <div class="game-starting-card" role="status" aria-live="polite">
+          <span>House lights down</span>
+          @if (gameService.showStartHint()) {
+            <h2>Find the lit seat</h2>
+            <p>Click it before the clock reaches zero. Each catch moves the target and builds the crowd.</p>
+          } @else {
+            <h2>Enjoy the show</h2>
+          }
+        </div>
+      }
+
+      <!-- Playing -->
+      @case (GameState.Playing) {
+        <!-- Top Game Bar -->
+        <div class="game-top-bar">
+          <div class="tickets-section">
+            <span class="hud-icon" [innerHTML]="iconService.getIconHtml('ticket')"></span>
+            <span class="tickets-value">{{ gameService.score() | number: '1.0-0' }}</span>
+            @if (scoreIncreaseAmount > 0) {
+              <span class="score increase">+{{ scoreIncreaseAmount | number: '1.0-0' }}</span>
+            }
+          </div>
+          <div class="timer-section" [ngClass]="getTimerClass(gameService.timer())">
+            <span class="hud-icon" [innerHTML]="iconService.getIconHtml('clock')"></span>
+            <span class="timer-value">{{
+              gameService.timer() < 0 ? '∞' : (gameService.timer() | number: '1.0-0')
+            }}</span>
+          </div>
+        </div>
+        @if (scoreIncreaseAmount > 0) {
+          <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {{ scoreIncreaseAmount | number: '1.0-0' }} tickets earned. Score
+            {{ gameService.score() | number: '1.0-0' }}.
+          </p>
+        }
+
+        <!-- Multiplier Display - Top Center -->
+        <div class="multiplier-display">
+          <span class="multiplier-value">{{ gameService.multiplier() | number: '1.1-1' }}X</span>
+          @if (multiplierIncreaseAmount > 0) {
+            <span class="multiplier increase">+{{ multiplierIncreaseAmount }}x</span>
+          }
+        </div>
+
+        <!-- Crowd mood — a small gauge tucked bottom-left; warms as you catch
+             seats and pays out as applause at the credits -->
+        <div
+          class="mood-meter"
+          [class.mood-hot]="audience.mood() >= 0.8"
+          aria-label="Crowd mood"
+          title="Crowd mood: please the house and it claps back bonus tickets at the credits"
+        >
+          <span class="mood-label">Crowd</span>
+          <div class="mood-track">
+            <div class="mood-fill" [style.width.%]="audience.mood() * 100"></div>
+          </div>
+        </div>
+
+        <!-- Active Power-ups Display -->
+        @if (activePowerUpsArray.length > 0) {
+          <div class="power-ups-display">
+            @for (powerUp of activePowerUpsArray; track powerUp.key) {
+              <div
+                class="power-up-item"
+                [ngClass]="{
+                  pulsing: shouldPulsePowerUp(powerUp.key),
+                  'concession-golden-popcorn': powerUp.key === 'ticketMultiplier',
+                  'concession-box-office': powerUp.key === 'passiveIncome',
+                  'concession-usher': powerUp.key === 'autoClicker',
+                  'usher-cooldown': powerUp.key === 'autoClicker' && !usherReady,
+                  'concession-spotlight': powerUp.key === 'magneticField',
+                  'concession-fortune': powerUp.key === 'luckyStreak',
+                  'concession-confetti': powerUp.key === 'ticketStorm',
+                  'concession-velvet': powerUp.key === 'seatUpgrade',
+                  'concession-dice': powerUp.key === 'criticalHit',
+                  'concession-streak': powerUp.key === 'comboMaster',
+                }"
+              >
+                <span class="hud-icon" [innerHTML]="iconService.getIconHtml(getPowerUpIcon(powerUp.key))"></span>
+                <div class="power-up-info">
+                  <span class="power-up-name">{{ getPowerUpName(powerUp.key) }}</span>
+                  @if (powerUp.key !== 'autoClicker' || usherReady) {
+                    <span class="power-up-effect">{{ getPowerUpEffect(powerUp.key, powerUp.value) }}</span>
+                  }
+                  @if (powerUp.key === 'autoClicker' && !usherReady) {
+                    <span class="power-up-effect usher-cooldown-text">
+                      Cooldown: {{ usherCooldown | number: '1.1-1' }}s
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Passive Income Indicator -->
+        @if (hasPassiveIncome) {
+          <div class="passive-income-indicator">
+            <span class="income-tick">+{{ passiveIncomeAmount }}</span>
+          </div>
+        }
+
+        <!-- Ticket Storm Effect -->
+        @if (ticketStormActive) {
+          <div class="ticket-storm-effect">
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <div class="ticket-particle" [style.animation-delay.ms]="i * 200"></div>
+            }
+          </div>
+        }
+      }
+
+      <!-- Paused - Keep empty to maintain pause state functionality -->
+      @case (GameState.Paused) {
+        <!-- Pause state kept for lobby functionality but no UI shown -->
+      }
+
+      <!-- Ended -->
+      @case (GameState.Ended) {
+        <div class="game-over" role="status" aria-live="polite" aria-atomic="true">
+          <h2>Final Curtain</h2>
+          @if (gameService.isNewHighScore()) {
+            <p class="new-high-score">
+              <span class="hud-icon" [innerHTML]="iconService.getIconHtml('star')" aria-hidden="true"></span>
+              New Box Office Record
+            </p>
+          }
+          <p class="final-score">
+            <span class="hud-icon" [innerHTML]="iconService.getIconHtml('ticket')"></span>
+            {{ gameService.score() | number: '1.0-0' }}
+            <span class="earned">(+{{ gameService.coinsEarned() | number: '1.0-0' }})</span>
+          </p>
+          @if (gameService.appBonusEarned() > 0) {
+            <p class="applause-line">
+              <span class="hud-icon" [innerHTML]="iconService.getIconHtml('users')" aria-hidden="true"></span>
+              Applause +{{ gameService.appBonusEarned() | number: '1.0-0' }}
+            </p>
+          }
+        </div>
+      }
+    }
+
+    <!-- Sound Toggle - Bottom Right of Screen -->
+    <button
+      class="sound-toggle"
+      (click)="soundToggle.emit()"
+      [class.muted]="isMuted"
+      [attr.aria-label]="isMuted ? 'Unmute sound' : 'Mute sound'"
+      [attr.aria-pressed]="isMuted"
+    >
+      <span
+        class="hud-icon"
+        [innerHTML]="iconService.getIconHtml(isMuted ? 'volume-mute' : 'volume-high')"
+        aria-hidden="true"
+      ></span>
+    </button>
+  </div>
+</div>

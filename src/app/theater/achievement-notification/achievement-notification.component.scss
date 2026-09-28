@@ -1,0 +1,215 @@
+@use 'variables' as *;
+
+.achievement-notification {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  z-index: 2000;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border: 2px solid #ffd700;
+  border-radius: 12px;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.5),
+    0 10px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  min-width: 350px;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+
+  &:hover {
+    transform: scale(0.98);
+    opacity: 0.95;
+  }
+
+  // Phone: a 350px min-width at right:2rem overflows a 360px viewport (~22px clipped
+  // off-screen). Pin to both edges and drop the min-width so it fits.
+  @media (max-width: 768px) {
+    top: 0.75rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    min-width: 0;
+  }
+}
+
+// Dismiss button — keyboard-accessible alternative to mouse-hover dismissal.
+// Floats top-right of the notification card; min 44×44 to satisfy WCAG 2.5.5.
+.notification-dismiss {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: rgba(255, 215, 0, 0.65);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: #ffd700;
+    background: rgba(255, 215, 0, 0.1);
+    border-color: rgba(255, 215, 0, 0.4);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px #1a1a1a,
+      0 0 0 4px #ffd700;
+  }
+}
+
+.notification-content {
+  padding: 1.5rem;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffd700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+
+  .hud-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex-shrink: 0;
+    animation: bounce 0.5s ease-out;
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+}
+
+.notification-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .achievement-icon {
+    width: 3rem;
+    height: 3rem;
+    flex-shrink: 0;
+    color: #ffd700;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  .achievement-details {
+    flex: 1;
+
+    h3 {
+      color: #fff;
+      font-size: 1.3rem;
+      margin: 0 0 0.25rem 0;
+    }
+
+    p {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin: 0;
+      line-height: 1.4;
+    }
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+  }
+  to {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.9));
+  }
+}
+
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT
+// ============================================
+
+:host-context(.day-mode) {
+  .achievement-notification {
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid #c19a6b; // Warm brown-gold
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(193, 154, 107, 0.2);
+
+    &:hover {
+      transform: scale(0.98);
+      opacity: 0.95;
+    }
+  }
+
+  .notification-header {
+    color: #8b4513; // Warm brown
+
+    .hud-icon {
+      color: #8b4513;
+    }
+  }
+
+  .notification-body {
+    .achievement-icon {
+      color: #c19a6b; // Warm brown-gold
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    }
+
+    .achievement-details {
+      h3 {
+        color: #2f4f4f; // Dark slate
+      }
+
+      p {
+        color: rgba(47, 79, 79, 0.7);
+      }
+    }
+  }
+
+  // Light mode glow animation - subtle
+  @keyframes glow {
+    from {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+    }
+    to {
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12));
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-header .hud-icon,
+  .notification-body .achievement-icon {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,166 @@
+// ====================================
+// LOBBY ANIMATIONS
+// ====================================
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes vintage-glow {
+  0%,
+  100% {
+    text-shadow:
+      3px 3px 0 #8b4513,
+      4px 4px 0 #654321,
+      5px 5px 10px rgba(0, 0, 0, 0.8),
+      0 0 10px rgba(255, 215, 0, 0.15);
+  }
+  50% {
+    text-shadow:
+      3px 3px 0 #8b4513,
+      4px 4px 0 #654321,
+      5px 5px 10px rgba(0, 0, 0, 0.8),
+      0 0 20px rgba(255, 215, 0, 0.25);
+  }
+}
+
+@keyframes light-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes vintage-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px) rotate(-1deg);
+  }
+  75% {
+    transform: translateX(5px) rotate(1deg);
+  }
+}
+
+@keyframes stock-ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes stats-ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes ticket-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(5deg);
+  }
+}
+
+@keyframes paused-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 4px 16px rgba(255, 215, 0, 0.2),
+      inset 0 1px 0 rgba(255, 215, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 8px 32px rgba(255, 215, 0, 0.4),
+      inset 0 2px 0 rgba(255, 215, 0, 0.2);
+  }
+}
+
+@keyframes theater-lights {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+// =============================================================================
+// Reduced Motion Accessibility
+// Disables animations for users who prefer reduced motion
+// =============================================================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

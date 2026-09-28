@@ -1,0 +1,50 @@
+<div class="power-ups-container">
+  @for (powerUp of powerUps; track powerUp.id) {
+    <div
+      class="power-up-item"
+      [class.active]="powerUp.active"
+      [class.permanent]="powerUp.isPermanent"
+      [class.disabled]="!powerUp.isPermanent && (powerUp.count === 0 || powerUp.active)"
+      [attr.role]="powerUp.isPermanent ? 'img' : 'button'"
+      [attr.tabindex]="powerUp.isPermanent ? null : 0"
+      [attr.aria-disabled]="!powerUp.isPermanent && (powerUp.count === 0 || powerUp.active)"
+      [attr.aria-pressed]="powerUp.isPermanent ? null : powerUp.active"
+      [attr.aria-label]="
+        powerUp.name +
+        (powerUp.isPermanent
+          ? powerUp.effectText
+            ? ', ' + powerUp.effectText
+            : ''
+          : ', ' + powerUp.count + ' available' + (powerUp.active ? ', currently active' : ''))
+      "
+      (click)="!powerUp.isPermanent ? usePowerUp(powerUp.id) : null"
+      (keydown.enter)="onPowerUpKeydown($event, powerUp)"
+      (keydown.space)="onPowerUpKeydown($event, powerUp)"
+    >
+      <div class="power-up-icon">
+        <i [class]="'fas ' + powerUp.icon"></i>
+      </div>
+
+      <!-- Permanent concession effect text -->
+      @if (powerUp.isPermanent && powerUp.effectText) {
+        <div class="power-up-effect">
+          {{ powerUp.effectText }}
+        </div>
+      }
+
+      <!-- Temporary power-up count -->
+      @if (!powerUp.isPermanent) {
+        <div class="power-up-count">
+          {{ powerUp.count }}
+        </div>
+      }
+
+      <!-- Active countdown for temporary power-ups -->
+      @if (!powerUp.isPermanent && powerUp.active && powerUp.remaining) {
+        <div class="power-up-active">
+          <span>{{ powerUp.remaining }}</span>
+        </div>
+      }
+    </div>
+  }
+</div>

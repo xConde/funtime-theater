@@ -1,0 +1,222 @@
+.seat-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  height: auto;
+  background: none;
+  align-items: center;
+  justify-content: center;
+  margin: -0.5rem;
+
+  transition:
+    filter 0.2s ease,
+    transform 0.2s ease;
+  touch-action: manipulation;
+  backface-visibility: hidden;
+  z-index: 1;
+
+  user-select: none; /* Standard CSS property */
+  -webkit-user-select: none; /* Safari/Chrome (WebKit) */
+  -moz-user-select: none; /* Firefox (old versions) */
+  -ms-user-select: none; /* IE/Edge (old versions) */
+
+  -webkit-tap-highlight-color: transparent;
+
+  // Keyboard focus is intentionally separate from the in-world target light:
+  // the cyan outline appears only for keyboard navigation, never as ambient
+  // decoration around a pointer-selected target.
+  &:focus-visible {
+    outline: 2px solid #88dbea;
+    outline-offset: 2px;
+    border-radius: 5px;
+  }
+
+  &.active {
+    animation: targetPulse 900ms ease-in-out infinite;
+    transform: scale(1.06);
+    filter: brightness(1.16) saturate(1.04);
+    z-index: 20;
+
+    .chair-svg {
+      filter: drop-shadow(0 2px 3px rgba(221, 190, 110, 0.42));
+    }
+
+    &:focus-visible {
+      outline: 1px dashed rgba(255, 241, 207, 0.9);
+      outline-offset: 1px;
+    }
+  }
+
+  &.clicked {
+    animation: bounce 0.5s ease-out;
+  }
+}
+
+// A pointer hover is an usher's acknowledgement, not a second target state.
+// Keep it material and local: one pixel of lift and a small upholstery exposure,
+// with no scale, gold light, halo, or persistent touch-screen hover.
+@media (hover: hover) and (pointer: fine) {
+  .seat-wrapper:not(.active):hover {
+    transform: translateY(-1px);
+    filter: brightness(1.07) saturate(0.98);
+    z-index: 10;
+
+    .seat-back-channel {
+      opacity: 0.42;
+    }
+
+    .chair-arm-cap {
+      filter: brightness(1.08);
+    }
+  }
+}
+
+.chair-svg {
+  display: block;
+  cursor: pointer;
+}
+
+.seat {
+  width: 100%;
+  height: 100%;
+  min-height: 3rem;
+  min-width: 3rem;
+}
+
+@keyframes targetPulse {
+  0%,
+  100% {
+    filter: brightness(1.12) saturate(1.03);
+  }
+  50% {
+    filter: brightness(1.26) saturate(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seat-wrapper {
+    transition: none;
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Auto-clicker effect
+.seat-wrapper.auto-clicked {
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 2px solid #ffd700;
+    border-radius: 50%;
+    animation: autoClickRipple 0.6s ease-out;
+    pointer-events: none;
+  }
+}
+
+@keyframes autoClickRipple {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+  }
+}
+
+// Magnetic field indicator
+.seat-wrapper.magnetic-range {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    border: 2px dashed rgba(138, 43, 226, 0.5);
+    border-radius: 50%;
+    animation: magneticPulse 2s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+}
+
+@keyframes magneticPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Warm Matinee Palette
+// ============================================
+
+:host-context(.day-mode) {
+  .seat-wrapper {
+    &.active {
+      .chair-svg {
+        // Warm amber active glow
+        filter: drop-shadow(0 2px 3px rgba(173, 130, 42, 0.4));
+      }
+    }
+  }
+
+  // Auto-clicker effect - Light Mode (warm amber)
+  .seat-wrapper.auto-clicked {
+    &::after {
+      border: 2px solid rgba(212, 172, 13, 0.8);
+    }
+  }
+
+  // Magnetic field indicator - Light Mode (warm brown)
+  .seat-wrapper.magnetic-range {
+    &::before {
+      border: 2px dashed rgba(121, 85, 72, 0.6);
+    }
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :host-context(.day-mode) .seat-wrapper:not(.active):hover {
+    filter: brightness(1.04) saturate(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seat-wrapper.active,
+  .seat-wrapper.clicked,
+  .seat-wrapper.auto-clicked::after,
+  .seat-wrapper.magnetic-range::before {
+    animation: none !important;
+  }
+}

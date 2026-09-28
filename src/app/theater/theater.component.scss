@@ -1,0 +1,356 @@
+@use 'sass:color';
+@use 'theater' as t;
+@use 'variables' as *;
+
+// Theater :host must participate in parent flex chain
+// (projects-detail → .main-box → TheaterComponent)
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+}
+
+// ::selection theming for this project lives in the shell's styles.scss
+// (element-scoped to the `app-theater` host tag), NOT here — see the comment
+// there for why: `:host ::selection` cannot reach text rendered by child
+// components (lobby, screen, seating-area) under Angular's emulated
+// encapsulation.
+
+// Funtime Theater container - fills to footer edge.
+// Uses definite height (not min-height) so descendant flex children can resolve against it.
+// Footer height expression mirrors footer.component.scss.
+.funtime-theater-container {
+  position: relative;
+  width: 100%;
+  // Fill the flex slot the embed (.main-box.demo-active) gives us — that slot already
+  // flex-fills to the site footer. The previous `height: calc(100dvh - <footer>)`
+  // reserved a fixed footer height that overshot the real footer (~78px) and didn't
+  // track the dynamic viewport, leaving a dead black band above the footer on phones
+  // in both the lobby and in-game. flex-fill resolves to a definite height via the
+  // flex chain (main-box has a definite height), so descendant flex children still
+  // resolve against it.
+  flex: 1 1 0;
+  min-height: 0;
+  background: var(--bg-color, #141414);
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.5s ease;
+  // Fixed-positioning containing block: keep the lobby + achievement-toast fixed
+  // overlays inside the project-detail embed (they bleed to the viewport on WebKit/iOS
+  // otherwise). A transform creates the CB in every engine. No canvas here, so safe.
+  transform: translateZ(0);
+}
+
+// Cross-tab conflict banner — surfaces a `storage` event from a sibling
+// tab so the player knows their checkpoint is stale before they keep
+// playing. assertive-live so screen readers announce immediately.
+.cross-tab-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #b8002e;
+  color: #fff;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+
+  &__text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__action {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0.5rem 1.25rem;
+    border: 2px solid #fff;
+    border-radius: 4px;
+    background: transparent;
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    // Gold focus-visible sweep: this ring rendered white (#fff), the only
+    // control in theater not using the house gold treatment. Recolored to
+    // match; width/offset kept as authored.
+    &:focus-visible {
+      outline: 2px solid #ffd700;
+      outline-offset: 2px;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cross-tab-banner__action {
+    transition: none !important;
+  }
+}
+
+.theater-wrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  background: var(--bg-color, #141414);
+  position: relative;
+  overflow: hidden;
+
+  // Theater container fills available space
+  .theater-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-height: 0;
+    position: relative;
+  }
+
+  .theater {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 1 0;
+    min-height: 0;
+    width: 100%;
+    background: var(--theater-stage-bg, #0a0a0a);
+    overflow: hidden;
+
+    .ambient-lighting {
+      display: none;
+    }
+
+    app-screen {
+      width: 95%;
+      flex: 0 0 auto;
+      min-height: 140px;
+      height: 30%;
+      box-shadow: 0 0 18px rgba(140, 100, 40, 0.16);
+
+      // Phone: widen toward full width to cut the side gutters.
+      @media (max-width: 767px) {
+        width: 98%;
+      }
+
+      // Tablet and up - slightly larger screen
+      @media (min-width: 768px) {
+        min-height: 160px;
+        height: 32%;
+      }
+
+      // Desktop - larger screen proportion
+      @media (min-width: 1024px) {
+        min-height: 180px;
+        height: 35%;
+      }
+    }
+
+    .floor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1 1 0; // Fill remaining space after screen
+      width: 100%;
+      min-height: 0;
+      position: relative;
+
+      app-seating-area {
+        flex: 1 1 0;
+        width: 82%;
+        max-width: 120rem;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+
+        // Phone: reclaim the 18% side gutters that letterbox the seating.
+        @media (max-width: 768px) {
+          width: 96%;
+        }
+      }
+    }
+  }
+
+  // Lobby button - sits inside .floor, below seating area
+  .lobby-button {
+    flex: 0 0 auto;
+    margin: 0.5rem 0;
+    min-width: 140px;
+    min-height: 44px; // WCAG touch target minimum
+    padding: 0.75rem 1.75rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      box-shadow 0.2s ease,
+      border-color 0.2s ease,
+      opacity 0.2s ease;
+    background: #2d1b1b;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    // Hidden by default
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    // Shown when game is playing
+    &.visible {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .hud-icon {
+      width: 1.1rem;
+      height: 1.1rem;
+      flex-shrink: 0;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    }
+
+    &:hover {
+      background: #3d2525;
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    &:active {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    // Gold focus-visible sweep: the LOBBY button had no focus-visible rule
+    // at all, so a keyboard user tabbing to it during Playing/Paused saw
+    // only the browser's native default ring. Matches the house double-ring
+    // convention (see `@mixin focus-ring` in styles/_design-system.scss).
+    &:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 2px var(--bg-color, #141414),
+        0 0 0 4px #ffd700;
+    }
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// =============================================================================
+// Reduced Motion Accessibility
+// =============================================================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .sound-toggle,
+  .lobby-button {
+    transition: none !important;
+  }
+}
+
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Warm Matinee Palette
+// ============================================
+
+:host-context(.day-mode) {
+  --theater-stage-bg: #e0d8cb;
+
+  .funtime-theater-container {
+    background: linear-gradient(to bottom, #ddd5c8, #d5cdc0);
+  }
+
+  .theater-wrapper {
+    background: #e8e0d4;
+    box-shadow: 0 4px 16px rgba(78, 52, 46, 0.1);
+    border: 1px solid rgba(109, 76, 65, 0.12);
+
+    .theater {
+      background: #e0d8cb;
+
+      app-screen {
+        box-shadow: 0 0 20px rgba(183, 149, 11, 0.15);
+      }
+
+      .floor {
+        background: linear-gradient(to bottom, rgba(109, 76, 65, 0.03), rgba(78, 52, 46, 0.06));
+      }
+    }
+
+    // Lobby button - warm espresso theme for light mode
+    .lobby-button {
+      background: #5d4037;
+      color: #f5f0e8;
+      border: 2px solid transparent;
+      box-shadow: 0 2px 8px rgba(78, 52, 46, 0.15);
+
+      &:hover {
+        background: #6d4c41;
+        border-color: rgba(245, 240, 232, 0.25);
+        box-shadow: 0 4px 12px rgba(78, 52, 46, 0.2);
+      }
+
+      &:active {
+        box-shadow: 0 2px 4px rgba(78, 52, 46, 0.15);
+      }
+
+      // Gold focus-visible sweep: this day-mode box-shadow and the base
+      // `.lobby-button:focus-visible` fix above share equal specificity
+      // (`:host-context()` counts as one pseudo-class) and this block
+      // compiles later, so it silently won and swallowed the gold ring in
+      // day mode specifically. Same fix, re-declared here.
+      &:focus-visible {
+        outline: none;
+        box-shadow:
+          0 0 0 2px var(--bg-color, #141414),
+          0 0 0 4px #ffd700;
+      }
+    }
+  }
+}

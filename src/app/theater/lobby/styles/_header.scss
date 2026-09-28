@@ -1,0 +1,61 @@
+// ====================================
+// HEADER
+// ====================================
+@use '../lobby-variables' as *;
+
+.theater-header {
+  text-align: center;
+  // Top padding clears the absolutely-positioned marquee lights (desktop top: -10px,
+  // mobile top: -6px) so the bulbs aren't clipped by the lobby-container's
+  // overflow:hidden top edge on any viewport.
+  padding: 0.9rem 0 0;
+  flex-shrink: 0;
+  position: relative;
+
+  .theater-marquee {
+    position: relative;
+    display: inline-block;
+
+    .theater-title {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #ffd700;
+      margin: 0;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      @include gold-text-shadow-large;
+      font-family: 'Arial Black', sans-serif;
+      animation: vintage-glow $anim-loop-slow ease-in-out infinite;
+      user-select: none;
+
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+      }
+    }
+
+    .marquee-lights {
+      position: absolute;
+      top: -10px;
+      left: -20px;
+      right: -20px;
+      display: flex;
+      justify-content: space-around;
+
+      .light {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: $color-gold;
+        box-shadow:
+          0 0 10px $color-gold-light,
+          0 0 20px $color-gold-lighter;
+        animation: light-flicker $anim-loop ease-in-out infinite;
+        opacity: 0.9;
+
+        &:nth-child(odd) {
+          animation-delay: 0.5s;
+        }
+      }
+    }
+  }
+}

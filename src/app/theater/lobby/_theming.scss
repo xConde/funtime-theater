@@ -1,0 +1,603 @@
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Matinee Theater Palette
+// Warmer, dimmer aesthetic like a daytime theater screening
+// ============================================
+@use 'sass:color';
+@use 'variables' as *;
+@use 'lobby-variables' as *;
+@use '../styles/design-system' as ds;
+
+// Matinee-specific colors (dimmer than standard day mode)
+$matinee-base: #e8e0d4; // Warm taupe - like theater interior
+$matinee-warm: #ddd5c8; // Slightly darker for depth
+$matinee-card: #f5f0e8; // Cards slightly lighter for contrast
+
+:host-context(.day-mode) {
+  // Override CSS variables for matinee theater palette
+  --lobby-bg: #{$matinee-base};
+  --lobby-bg-dark: #{$matinee-warm};
+  --lobby-overlay-color: #{ds.$color-light-text};
+  --lobby-overlay-accent: rgba(109, 76, 65, 0.05);
+
+  .lobby-container {
+    background: $matinee-warm;
+    background-image:
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(109, 76, 65, 0.04) 10px,
+        rgba(109, 76, 65, 0.04) 20px
+      ),
+      radial-gradient(ellipse at center, $matinee-base 0%, $matinee-warm 100%);
+  }
+
+  .lobby-overlay {
+    background: radial-gradient(ellipse at center, rgba(139, 63, 58, 0.08) 0%, rgba(232, 224, 212, 0.95) 60%);
+  }
+
+  .lobby-content {
+    background: linear-gradient(to bottom, $matinee-base, $matinee-warm);
+    box-shadow: 0 4px 20px rgba(78, 52, 46, 0.18);
+  }
+
+  .lobby-header {
+    background: linear-gradient(to bottom, #1a1414, #0a0808);
+    border-bottom: 3px solid rgba(255, 215, 0, 0.3);
+
+    .lobby-title {
+      color: #ffd700;
+      text-shadow:
+        2px 2px 0 #8b4513,
+        3px 3px 0 #654321,
+        4px 4px 8px rgba(0, 0, 0, 0.8),
+        0 0 30px rgba(255, 215, 0, 0.4);
+    }
+
+    .close-lobby-btn {
+      color: #ffd700;
+      background: rgba(198, 40, 40, 0.2);
+      border: 2px solid rgba(198, 40, 40, 0.5);
+
+      &:hover {
+        background: rgba(198, 40, 40, 0.4);
+        border-color: rgba(198, 40, 40, 0.7);
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  .lobby-tabs {
+    background: rgba(139, 69, 19, 0.08);
+    border-bottom: 2px solid $day-dramatic-border;
+
+    .tab-button {
+      color: ds.$color-light-muted;
+      border-bottom: 3px solid transparent;
+
+      &:hover {
+        color: $day-color;
+        background: rgba(139, 69, 19, 0.1);
+      }
+
+      &.active {
+        color: $day-color;
+        border-bottom-color: ds.$color-light-amber;
+        background: rgba(139, 69, 19, 0.15);
+      }
+    }
+  }
+
+  .player-info {
+    background: rgba(139, 69, 19, 0.08);
+    border: 2px solid $day-dramatic-border;
+    box-shadow: 0 2px 8px rgba(109, 76, 65, 0.15);
+
+    .player-level,
+    .player-tickets {
+      color: $day-color;
+
+      .value {
+        color: ds.$color-light-amber;
+        text-shadow: 0 1px 2px rgba(255, 215, 0, 0.2);
+      }
+    }
+
+    .progress-bar-container {
+      background: rgba(109, 76, 65, 0.15);
+
+      .progress-bar-fill {
+        background: linear-gradient(to right, $successColor, color.adjust($successColor, $lightness: 10%));
+      }
+    }
+  }
+
+  .mode-card {
+    background: $matinee-card;
+    border: 2px solid rgba(109, 76, 65, 0.18);
+    box-shadow: 0 2px 8px rgba(78, 52, 46, 0.1);
+
+    &::before {
+      opacity: 0;
+    }
+    &::after {
+      background: none;
+    }
+
+    &:not(.locked):hover {
+      background: linear-gradient(135deg, #fffdf8, #fef8ec); // Warm cream with subtle amber tint
+      border-color: #b7950b; // Distinct amber border
+      box-shadow:
+        0 6px 20px rgba(183, 149, 11, 0.25),
+        0 0 0 1px rgba(183, 149, 11, 0.15); // Amber glow
+      transform: translateY(-3px);
+    }
+
+    &.selected {
+      background: linear-gradient(135deg, #f8f4ec, #f0ebe0);
+      border-color: #8b4513;
+      border-width: 2px;
+      box-shadow:
+        0 4px 12px rgba(78, 52, 46, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+      // Gold focus-visible sweep: this day-mode override and the base
+      // `.mode-card.selected:focus-visible` fix (styles/_mode-card.scss)
+      // share equal specificity (`:host-context()` counts as one
+      // pseudo-class), and this partial compiles later, so it silently won
+      // and swallowed the gold ring again in day mode specifically. Same
+      // fix, mirrored here with this block's own box-shadow as the base.
+      &:focus-visible {
+        box-shadow:
+          0 4px 12px rgba(78, 52, 46, 0.12),
+          inset 0 1px 0 rgba(255, 255, 255, 0.5),
+          0 0 0 2px var(--bg-color, #141414),
+          0 0 0 4px #ffd700;
+      }
+    }
+
+    &.locked {
+      background: rgba(221, 213, 200, 0.6);
+      opacity: 0.7;
+      border-color: rgba(109, 76, 65, 0.1);
+
+      // The base (night-mode) .locked h3 (#8f8f8f) and .mode-icon (#6a6a6a) tie
+      // this block on CSS specificity and win on source order (mode-card.scss
+      // loads after theming.scss in lobby.component.scss), so a dark-mode gray
+      // leaked onto this light matinee surface — near-invisible. Override
+      // explicitly with day-mode ink.
+      //
+      // IMPORTANT: this rule's own `opacity: 0.7` is a GROUP opacity — it
+      // composites the text's rendered color toward the card's backdrop
+      // (~#e0d8ca), not toward its own background-color. A solid #4a372e text
+      // color measured ~(119,103,93) on screen after that composite — only
+      // ~3.8:1, failing AA. The colors below are chosen dark enough that the
+      // POST-composite (0.7 × color + 0.3 × backdrop) result still clears AA:
+      // ~5.8:1 for h3/.lock-indicator text, ~4.2:1 for the (non-text,
+      // 3:1-minimum) .mode-icon — verified against the rendered screenshot,
+      // not just the pre-composite hex.
+      .mode-name,
+      h3 {
+        color: #1a120c;
+        text-shadow: none;
+      }
+
+      .mode-icon {
+        color: #3a2a22;
+        filter: none;
+      }
+
+      .lock-indicator {
+        color: #1a120c;
+
+        i {
+          color: #3a2a22;
+        }
+      }
+    }
+
+    &.minted {
+      border-color: rgba(109, 76, 65, 0.25);
+      background: $matinee-card;
+      box-shadow: 0 2px 8px rgba(78, 52, 46, 0.1);
+    }
+
+    .mode-icon {
+      color: #8b4513;
+      opacity: 0.9;
+      filter: drop-shadow(1px 1px 0 rgba(139, 69, 19, 0.3));
+    }
+
+    .mode-name,
+    h3 {
+      color: #5d4037; // Darker espresso for better contrast
+      text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.6); // Light shadow for depth
+    }
+
+    .mode-description {
+      color: ds.$color-light-muted;
+    }
+
+    .best-score {
+      color: #8b4513;
+      text-shadow: none;
+
+      .trophy-icon path {
+        fill: #8b4513;
+      }
+    }
+
+    .lock-overlay {
+      background: rgba(240, 235, 225, 0.95);
+
+      .lock-icon {
+        color: rgba(109, 76, 65, 0.4);
+      }
+
+      .unlock-cost {
+        color: $day-color;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid ds.$color-light-border;
+      }
+    }
+  }
+
+  .power-up-item {
+    background: $matinee-card;
+    border: 2px solid rgba(109, 76, 65, 0.18);
+    box-shadow: 0 2px 8px rgba(78, 52, 46, 0.1);
+
+    &::before {
+      opacity: 0;
+      background: none;
+    }
+    &:hover:not(:disabled) {
+      background: #f8f4ec;
+      border-color: rgba(109, 76, 65, 0.28);
+      box-shadow: 0 4px 12px rgba(78, 52, 46, 0.15);
+    }
+    &:disabled {
+      background: rgba(221, 213, 200, 0.6);
+      border-color: rgba(109, 76, 65, 0.1);
+      &::after {
+        content: 'SOLD OUT';
+        color: #8b7355;
+        text-shadow: none;
+        background: none;
+      }
+    }
+    .power-up-visual {
+      background: rgba(139, 69, 19, 0.08);
+      .power-icon {
+        color: #7a4a2a;
+        filter: drop-shadow(1px 1px 0 rgba(139, 69, 19, 0.25));
+      }
+    }
+    .power-up-details {
+      h4 {
+        color: ds.$color-light-text;
+        text-shadow: none;
+      }
+      p {
+        color: ds.$color-light-muted;
+        text-shadow: none;
+      }
+    }
+    .power-up-price {
+      background: rgba(245, 240, 232, 0.9);
+      color: ds.$color-light-text-secondary;
+      border: 1px solid rgba(109, 76, 65, 0.12);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-shadow: none;
+      .cost,
+      span {
+        color: ds.$color-light-text-secondary;
+        font-weight: 700;
+        font-family: 'Arial Black', sans-serif;
+        text-shadow: none;
+      }
+      i {
+        color: ds.$color-light-text-secondary;
+        filter: drop-shadow(0 0 0 transparent);
+      }
+    }
+  }
+
+  // Power-up cards
+  .power-up-card {
+    background: $matinee-card;
+    border: 2px solid rgba(109, 76, 65, 0.2);
+    box-shadow: 0 2px 6px rgba(78, 52, 46, 0.12);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(109, 76, 65, 0.2);
+      border-color: color.adjust($day-color, $lightness: -5%);
+    }
+
+    &.owned {
+      border-color: rgba(46, 125, 50, 0.5);
+      background: rgba(46, 125, 50, 0.05);
+    }
+
+    .power-up-icon {
+      color: $day-color;
+      background: rgba(139, 69, 19, 0.1);
+      border: 2px solid $day-dramatic-border;
+
+      &.svg-icon img {
+        filter: brightness(0.85);
+      }
+    }
+
+    .power-up-name {
+      color: $day-color;
+      text-shadow: 1px 1px 0 rgba(139, 69, 19, 0.1);
+    }
+
+    .power-up-description {
+      color: rgba(109, 76, 65, 0.8);
+    }
+
+    .power-up-footer {
+      border-top: 1px solid $day-dramatic-border;
+
+      .power-up-cost {
+        color: ds.$color-light-amber;
+
+        i {
+          color: ds.$color-light-amber;
+        }
+      }
+
+      .power-up-owned {
+        color: $successColor;
+      }
+
+      .buy-button {
+        background: rgba(46, 125, 50, 0.15);
+        color: $successColor;
+        border: 2px solid rgba(46, 125, 50, 0.4);
+
+        &:hover:not(:disabled) {
+          background: rgba(46, 125, 50, 0.25);
+          border-color: $successColor;
+        }
+
+        &:disabled {
+          background: rgba(109, 76, 65, 0.08);
+          color: rgba(109, 76, 65, 0.4);
+          border-color: $day-border;
+        }
+      }
+    }
+  }
+
+  // Achievement cards
+  .achievement-card {
+    background: $matinee-card;
+    border: 2px solid rgba(109, 76, 65, 0.2);
+    box-shadow: 0 2px 6px rgba(78, 52, 46, 0.12);
+
+    &.unlocked {
+      border-color: rgba(46, 125, 50, 0.5);
+      background: rgba(46, 125, 50, 0.05);
+
+      .achievement-icon {
+        color: $successColor;
+        background: rgba(46, 125, 50, 0.15);
+      }
+    }
+
+    &.locked {
+      opacity: 0.6;
+
+      .achievement-icon {
+        color: rgba(109, 76, 65, 0.4);
+        background: rgba(109, 76, 65, 0.05);
+      }
+    }
+
+    .achievement-name {
+      color: $day-color;
+    }
+
+    .achievement-description {
+      color: rgba(109, 76, 65, 0.8);
+    }
+
+    .achievement-progress {
+      color: ds.$color-light-muted;
+
+      .progress-bar {
+        background: rgba(109, 76, 65, 0.1);
+
+        .progress-fill {
+          background: linear-gradient(to right, $successColor, color.adjust($successColor, $lightness: 10%));
+        }
+      }
+    }
+  }
+
+  // Start button
+  .start-button {
+    background: linear-gradient(135deg, rgba(46, 125, 50, 0.2), rgba(46, 125, 50, 0.15));
+    color: $successColor;
+    border: 3px solid rgba(46, 125, 50, 0.5);
+    box-shadow:
+      0 4px 12px rgba(46, 125, 50, 0.2),
+      inset 0 2px 4px rgba(46, 125, 50, 0.1);
+    text-shadow: 2px 2px 0 rgba(46, 125, 50, 0.2);
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(46, 125, 50, 0.3), rgba(46, 125, 50, 0.25));
+      border-color: $successColor;
+      box-shadow:
+        0 6px 20px rgba(46, 125, 50, 0.3),
+        inset 0 2px 4px rgba(46, 125, 50, 0.15);
+    }
+
+    &:disabled {
+      background: rgba(109, 76, 65, 0.1);
+      color: rgba(109, 76, 65, 0.4);
+      border-color: $day-border;
+    }
+  }
+
+  // Ticket breakdown
+  .ticket-breakdown {
+    .saved-tickets {
+      color: ds.$color-light-amber;
+    }
+
+    .plus {
+      color: rgba(109, 76, 65, 0.5);
+    }
+
+    .current-tickets {
+      color: $successColor;
+    }
+  }
+
+  // Current game indicator
+  .best-score.current-game {
+    color: $successColor;
+
+    .trophy-icon path {
+      fill: $successColor;
+      stroke: color.adjust($successColor, $lightness: -10%);
+    }
+
+    .trophy-icon circle {
+      fill: color.adjust($successColor, $lightness: -15%);
+    }
+  }
+
+  // Stats section
+  .stats-summary {
+    background: rgba(139, 69, 19, 0.08);
+    border: 2px solid $day-dramatic-border;
+
+    .stat-item {
+      color: $day-color;
+
+      .stat-value {
+        color: ds.$color-light-amber;
+      }
+    }
+  }
+
+  // Scrollbar for light mode
+  .achievements-grid,
+  .power-ups-grid {
+    &::-webkit-scrollbar-track {
+      background: rgba(109, 76, 65, 0.05);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(109, 76, 65, 0.2);
+      border: 1px solid $day-border;
+
+      &:hover {
+        background: rgba(109, 76, 65, 0.3);
+      }
+    }
+  }
+
+  // Outer lobby scrollbar - matches the shared design-system mixin used by
+  // lobby/styles/_base.scss's dark-mode default.
+  .lobby-wrapper {
+    @include ds.scrollbar-light;
+  }
+
+  // Achievements Section - Light Mode
+  .achievements-section {
+    background: $matinee-card;
+    border: 2px solid rgba(109, 76, 65, 0.18);
+    box-shadow: 0 2px 8px rgba(78, 52, 46, 0.1);
+
+    &::before {
+      opacity: 0;
+    }
+
+    h3 {
+      color: #6d4c41;
+      text-shadow: none;
+    }
+
+    .achievements-grid {
+      &::-webkit-scrollbar-track {
+        background: rgba(109, 76, 65, 0.06);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: rgba(139, 69, 19, 0.25);
+
+        &:hover {
+          background: rgba(139, 69, 19, 0.4);
+        }
+      }
+    }
+
+    .achievement-item {
+      background: rgba(245, 240, 232, 0.8);
+      border: 1px solid rgba(109, 76, 65, 0.15);
+
+      &.unlocked {
+        background: rgba(183, 149, 11, 0.12); // Warm amber tint per style guide
+        border-color: rgba(183, 149, 11, 0.35);
+
+        .achievement-icon {
+          color: #8b6914; // Amber/gold icon
+          filter: drop-shadow(1px 1px 0 rgba(139, 105, 20, 0.3));
+        }
+
+        // Readable text on amber-tinted background
+        .achievement-info {
+          h4 {
+            color: #5d4037 !important; // Warm brown - readable
+            text-shadow: none !important;
+          }
+
+          p {
+            color: #6d4c41;
+          }
+        }
+      }
+
+      &:not(.unlocked) {
+        opacity: 0.6;
+        background: rgba(221, 213, 200, 0.6);
+
+        .achievement-icon {
+          color: rgba(109, 76, 65, 0.4);
+        }
+      }
+
+      .achievement-info {
+        h4 {
+          color: ds.$color-light-text;
+        }
+
+        p {
+          color: ds.$color-light-muted;
+        }
+
+        .achievement-progress {
+          .progress-bar {
+            background: rgba(109, 76, 65, 0.12);
+
+            .progress-fill {
+              background: linear-gradient(to right, #2e7d32, #4caf50);
+            }
+          }
+
+          .progress-text {
+            color: rgba(109, 76, 65, 0.6);
+          }
+        }
+      }
+    }
+  }
+}

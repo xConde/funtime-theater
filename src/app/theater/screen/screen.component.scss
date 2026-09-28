@@ -1,0 +1,21 @@
+// ====================================
+// SCREEN COMPONENT - Main Entry Point
+// ====================================
+// This file imports all modular stylesheets.
+// Individual styles are organized in the styles/ directory.
+
+// External dependencies
+@use 'sass:color';
+@use 'screen' as s;
+@use 'variables' as *;
+
+// Component styles (order matters for cascade)
+@use 'styles/base';
+@use 'styles/top-bar';
+@use 'styles/power-ups';
+@use 'styles/effects';
+@use 'styles/game-over';
+@use 'styles/theater-scene';
+@use 'styles/film-layer';
+@use 'styles/announcement';
+@use 'styles/light-mode';

@@ -1,0 +1,451 @@
+// Patron layer — absolute overlay inside seating-area, between the chairs
+// (active chair z-20 inside its row's stacking context) and the staff layer
+// (z-50). pointer-events stay off so seat clicks pass through to the chairs.
+
+:host {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 30;
+}
+
+// Mirrors the seating-area's flex skeleton so patrons line up with the chairs.
+// Same padding, same row/seat flex rules, same stairs gap, same entry spacer.
+.patron-house {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 0.75rem 0.5rem;
+  pointer-events: none;
+  // A single cool projector ink ties the crowd to the screen without turning
+  // skin, hair, or coats into glossy lit spheres.
+  --projector-edge: rgba(193, 211, 218, 0.36);
+}
+
+// The audience is already seeded while the instruction card is on screen.
+// A single house-wide settle is calmer than making every chair pop in when the
+// FSM flips to Playing, and it gives the 1.8s starting beat a visible purpose.
+.patron-house.is-settling {
+  animation: houseSettle 700ms ease-out both;
+}
+
+@keyframes houseSettle {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.p-row {
+  display: flex;
+  justify-content: space-between;
+  min-height: 3.25rem;
+  width: 100%;
+  flex: 1 1 0;
+  transform-origin: center center;
+}
+
+.p-seats {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 4rem;
+  justify-content: space-around;
+  align-items: center;
+  margin: 0 0 0.5rem;
+}
+
+.p-stairs {
+  flex: 0 0 auto;
+}
+
+.p-slot {
+  position: relative;
+  flex: 1 1 auto;
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.p-entry {
+  flex: 0 0 auto;
+  width: 100%;
+  height: 0.6rem;
+}
+
+// ---------------------------------------------------------------------------
+// Rear-of-house screenprint silhouettes. Each patron has separate flat inks for
+// skin, coat, and hair/headwear; the only shared highlight is a narrow projector
+// edge. Sized off the seat slot so figures recede with their chair row.
+// ---------------------------------------------------------------------------
+.patron {
+  position: relative;
+  width: calc(var(--p-size, 1) * 50%);
+  max-width: calc(var(--p-size, 1) * 2.3rem);
+  display: block;
+  // Drop the figure into the upholstery: the chair-shaped shoulder cutout below
+  // lets the backrest visually pass in front of the patron's lower torso.
+  margin-bottom: 11%;
+  opacity: 0.94;
+  // No will-change: transform/opacity keyframes are already GPU-composited, and
+  // promoting every one of ~100+ patrons to its own layer blows the layer
+  // budget. The :host overflow:hidden gives the layer a single composite surface.
+  transform-origin: center bottom;
+  animation: patronBreathe var(--breath, 3400ms) ease-in-out infinite;
+  transition: opacity 0.45s ease;
+  --shoulder-width: 106%;
+}
+
+.patron-figure {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.28 / 1;
+  transform-origin: center bottom;
+}
+
+// Posture is applied to a nested figure so the house-reaction animation can
+// continue to transform the outer patron without overwriting this authored pose.
+.patron[data-posture='upright'] .patron-figure {
+  transform: translateY(-2%);
+}
+
+.patron[data-posture='slouch'] .patron-figure {
+  transform: translateY(7%) scaleY(0.93);
+}
+
+.patron[data-posture='lean-left'] .patron-figure {
+  transform: translateX(-3%) rotate(-2deg);
+}
+
+.patron[data-posture='lean-right'] .patron-figure {
+  transform: translateX(3%) rotate(2deg);
+}
+
+.patron[data-build='narrow'] {
+  --shoulder-width: 96%;
+}
+
+.patron[data-build='broad'] {
+  --shoulder-width: 116%;
+}
+
+.patron-head {
+  position: absolute;
+  left: 50%;
+  bottom: 30%;
+  width: calc(var(--p-head-w, 0.44) * 100%);
+  aspect-ratio: 0.86;
+  transform: translateX(-50%);
+  border-radius: 46% 46% 38% 40% / 42% 42% 54% 54%;
+  background: var(--skin-color, #875b48);
+  box-shadow:
+    inset 0 1px 0 var(--projector-edge),
+    0 1px 2px rgba(0, 0, 0, 0.46);
+  z-index: 3;
+}
+
+.patron-neck {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  width: 18%;
+  height: 25%;
+  transform: translateX(-50%);
+  border-radius: 0 0 34% 34%;
+  background: var(--skin-color, #875b48);
+  box-shadow: inset 1px 0 0 rgba(36, 25, 24, 0.18);
+  z-index: 2;
+}
+
+// The coat is a clipped shoulder crest rather than a complete torso. The
+// concave lower edge follows the crown of the chair back, so the upholstery
+// visible through the centre reads as the foreground occluder.
+.patron-shoulders {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: var(--shoulder-width);
+  height: 18%;
+  transform: translateX(-50%);
+  clip-path: polygon(
+    8% 100%,
+    13% 53%,
+    28% 18%,
+    43% 4%,
+    57% 4%,
+    72% 18%,
+    87% 53%,
+    92% 100%,
+    76% 100%,
+    70% 92%,
+    62% 83%,
+    50% 79%,
+    38% 83%,
+    30% 92%,
+    24% 100%
+  );
+  border-radius: 42% 42% 8% 8% / 58% 58% 8% 8%;
+  background: var(--coat-color, #273840);
+  box-shadow: inset 0 1px 0 var(--projector-edge);
+  z-index: 1;
+}
+
+// Hair and headwear, drawn from behind on the back of the head in the per-seat
+// --wear-color. Bare heads show nothing; long hair falls behind the head over
+// the seat back; caps, hats and beanies sit on top.
+.patron-head::before,
+.patron-head::after {
+  content: '';
+  position: absolute;
+}
+
+// Short hair — a cap of hair over the crown.
+.patron[data-wear='short'] .patron-head::before {
+  top: -7%;
+  left: -4%;
+  right: -4%;
+  height: 64%;
+  border-radius: 50% 50% 40% 40%;
+  background: var(--wear-color);
+}
+
+// Long hair — a cap plus a fall down past the head, behind it, over the seat back.
+.patron[data-wear='long'] .patron-head::before {
+  top: -7%;
+  left: -7%;
+  right: -7%;
+  height: 58%;
+  border-radius: 50% 50% 38% 38%;
+  background: var(--wear-color);
+}
+.patron[data-wear='long'] .patron-head::after {
+  top: 24%;
+  left: -5%;
+  right: -5%;
+  height: 72%;
+  border-radius: 36% 36% 46% 46% / 22% 22% 60% 60%;
+  background: var(--wear-color);
+  z-index: -1;
+}
+
+// Baseball cap — a fabric crown with the little gap in the back strap.
+.patron[data-wear='cap'] .patron-head::before {
+  top: -13%;
+  left: -4%;
+  right: -4%;
+  height: 58%;
+  border-radius: 50% 50% 46% 46%;
+  background: var(--wear-color);
+  box-shadow: inset 0 1px 0 rgba(193, 211, 218, 0.2);
+}
+.patron[data-wear='cap'] .patron-head::after {
+  top: 22%;
+  left: 43%;
+  width: 14%;
+  height: 9%;
+  border-radius: 1px;
+  background: var(--skin-color);
+}
+
+// Brimmed hat — a crown-dominant felt hat with a modest brim. The crown is
+// taller than the brim is wide and overlaps it, so the two shapes read as one
+// hat sitting on the head rather than a saucer with a stub on top.
+.patron[data-wear='hat'] .patron-head::before {
+  top: 2%;
+  left: -11%;
+  right: -11%;
+  height: 20%;
+  border-radius: 44% 44% 32% 32%;
+  background: var(--wear-color);
+  box-shadow: inset 0 1px 0 rgba(193, 211, 218, 0.18);
+}
+.patron[data-wear='hat'] .patron-head::after {
+  top: -26%;
+  left: 13%;
+  right: 13%;
+  height: 42%;
+  border-radius: 46% 46% 18% 18%;
+  background: var(--wear-color);
+  box-shadow: inset 0 1px 0 rgba(193, 211, 218, 0.18);
+}
+
+// Beanie — a knit cap with a flat-ish crown and a distinct folded cuff. The
+// crown is kept short so the head still shows below the cuff line (the cue that
+// separates a cap-on-a-head from a featureless orb), and the cuff is a wide,
+// clearly darker band so it reads as ribbed knit even in the back rows.
+.patron[data-wear='beanie'] .patron-head::before {
+  top: -5%;
+  left: -4%;
+  right: -4%;
+  height: 56%;
+  border-radius: 48% 48% 36% 36%;
+  background: var(--wear-color);
+  box-shadow: inset 0 1px 0 rgba(193, 211, 218, 0.18);
+}
+.patron[data-wear='beanie'] .patron-head::after {
+  top: 47%;
+  left: -9%;
+  right: -9%;
+  height: 22%;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--wear-color) 66%, #0d0c0f);
+}
+
+// The phone: a cool screen-glow held up in a dark room. Lit only in the quiet.
+.patron-phone {
+  position: absolute;
+  bottom: 10%;
+  right: -7%;
+  width: 20%;
+  height: 28%;
+  border-radius: 1px;
+  background: #cfe8ff;
+  box-shadow: 0 0 6px 2px rgba(150, 205, 255, 0.65);
+  opacity: 0;
+}
+
+// The patron in the active seat is the one you are ushering, so keep them fully
+// present. They are only a head cresting the seat back, so the gold highlight
+// still reads clearly around and below them.
+.patron.is-active {
+  opacity: 1;
+}
+
+// ---------------------------------------------------------------------------
+// Reactions — the whole house switches mode with the beat; the per-patron
+// animation-delay (bound inline) spreads the onset into a wave.
+// ---------------------------------------------------------------------------
+.patron-house[data-reaction='lean-in'] .patron {
+  animation: patronLean 2600ms ease-in-out infinite;
+}
+
+.patron-house[data-reaction='flinch'] .patron {
+  animation: patronFlinch var(--flinch, 540ms) ease-out infinite;
+}
+
+.patron-house[data-reaction='restless'] .patron {
+  animation: patronRestless 2200ms ease-in-out infinite;
+}
+
+.patron-house[data-reaction='murmur'] .patron {
+  animation: patronMurmur 2400ms ease-in-out infinite;
+}
+
+.patron-house[data-reaction='settle'] .patron {
+  animation: patronBreathe 3000ms ease-in-out infinite;
+}
+
+// Phones glow only while the room is restless (the quiet beats).
+.patron-house[data-reaction='restless'] .patron.has-phone .patron-phone {
+  opacity: 1;
+  animation: phoneFlicker 2600ms ease-in-out infinite;
+}
+
+@keyframes patronBreathe {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-1%) scaleY(1.02);
+  }
+}
+
+// Leaning toward the screen (up): drawn into the chase.
+@keyframes patronLean {
+  0%,
+  100% {
+    transform: translateY(-6%) scale(1.03);
+  }
+  50% {
+    transform: translateY(-8%) scale(1.035);
+  }
+}
+
+// The startle: a fast recoil back, then a settle with a little residual tension.
+@keyframes patronFlinch {
+  0% {
+    transform: translateY(0);
+  }
+  14% {
+    transform: translateY(10%) scaleY(0.95);
+  }
+  42% {
+    transform: translateY(-3%);
+  }
+  72% {
+    transform: translateY(1%);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+// Bored shifting in the quiet.
+@keyframes patronRestless {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-4%) rotate(-2deg);
+  }
+  75% {
+    transform: translateX(4%) rotate(2deg);
+  }
+}
+
+// Leaning to a neighbour at a twist.
+@keyframes patronMurmur {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(6%) rotate(3deg);
+  }
+}
+
+@keyframes phoneFlicker {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Paused: the film clock stops, so the house freezes with it. No layout work,
+// the layers just stop recompositing.
+// ---------------------------------------------------------------------------
+:host(.is-paused) .patron,
+:host(.is-paused) .patron-phone {
+  animation-play-state: paused;
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion: the house stays full and visible, it just holds still.
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .patron-house,
+  .patron,
+  .patron-phone {
+    animation: none !important;
+    transform: none !important;
+  }
+  .patron-house[data-reaction='restless'] .patron.has-phone .patron-phone {
+    opacity: 0.7;
+  }
+}

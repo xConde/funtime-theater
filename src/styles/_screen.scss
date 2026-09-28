@@ -1,0 +1,102 @@
+@use 'sass:map';
+
+// Base hue for color generation
+$base-hue: 50;
+$day-background: #fbf6e9;
+
+// Function to generate level colors
+@function generate-level-color($level, $total-levels: 20) {
+  $hue: $base-hue + (($level / $total-levels) * 300);
+
+  @if $hue >360 {
+    $hue: $hue - 360;
+  }
+
+  // Desaturated, aged tones — the level glow shifts hue as you climb without
+  // turning the screen frame into neon.
+  $saturation: 44% - (1% * $level);
+  $lightness: 46% + (1% * $level);
+
+  @return hsl($hue, $saturation, $lightness);
+}
+
+// Generate a map of 20 colors
+$color-levels: ();
+
+@for $i from 1 through 20 {
+  $color-levels: map-merge(
+    $color-levels,
+    (
+      $i: generate-level-color($i),
+    )
+  );
+}
+
+// Keyframes for pulse animation
+@keyframes pulseAnimation {
+  0% {
+    box-shadow: 0 0 10px transparent;
+  }
+
+  50% {
+    box-shadow: 0 0 14px currentColor;
+  }
+
+  100% {
+    box-shadow: 0 0 10px transparent;
+  }
+}
+
+// Mixin for color-level styles
+@mixin color-level-styles($total-levels: 20) {
+  @for $i from 1 through $total-levels {
+    &.current-level-#{$i} {
+      border-color: map.get($color-levels, $i);
+      color: map.get($color-levels, $i);
+      box-shadow: 0 0 11px map.get($color-levels, $i);
+      // Apply color to child elements
+
+      .score,
+      .timer,
+      .hover,
+      .multiplier,
+      .game-over,
+      .game-over h2,
+      .game-over p,
+      .game-over .final-score {
+        color: map.get($color-levels, $i);
+      }
+    }
+  }
+}
+
+// Mixin for common styles (score, timer, etc.)
+@mixin common-styles {
+  position: absolute;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px 10px;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+// Mixin for increase animation styles
+@mixin increase-animation($duration: 0.6s) {
+  transform: translate(-50%, -50%);
+  opacity: 1;
+  animation: increaseAnimation $duration ease-out forwards;
+}
+
+// Keyframes for increase animation
+@keyframes increaseAnimation {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(1.4);
+  }
+}

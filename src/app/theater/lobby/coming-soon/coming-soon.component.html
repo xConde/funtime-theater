@@ -1,0 +1,42 @@
+<section class="coming-soon" aria-label="Coming soon">
+  <span class="coming-soon__eyebrow">COMING SOON</span>
+  <div class="coming-soon__wall">
+    @for (film of upcoming(); track $index; let i = $index) {
+      <div class="poster-frame" [class.poster-frame--alt]="i % 2 === 1" tabindex="0">
+        <canvas
+          #posterCanvas
+          class="coming-soon__poster"
+          [attr.width]="posterWidth"
+          [attr.height]="posterHeight"
+          role="img"
+          [attr.aria-label]="film.title + ' (' + film.year + '). ' + film.tagline"
+        ></canvas>
+        @if (pasting()[i]) {
+          <span class="poster-paper" aria-hidden="true"></span>
+        }
+        @if (covered()[i]) {
+          <span
+            class="poster-paper poster-paper--static"
+            [class.poster-paper--reveal]="revealing()[i]"
+            aria-hidden="true"
+          ></span>
+        }
+        <span class="poster-caption" aria-hidden="true">{{ film.tagline }}</span>
+      </div>
+    }
+    @if (stickerWalking()) {
+      <div class="billsticker" aria-hidden="true">
+        <span class="billsticker__leg billsticker__leg--left"></span>
+        <span class="billsticker__leg billsticker__leg--right"></span>
+        <span class="billsticker__arm-bucket"></span>
+        <span class="billsticker__bucket"></span>
+        <span class="billsticker__body"></span>
+        <span class="billsticker__head"></span>
+        <span class="billsticker__cap"></span>
+        <span class="billsticker__brim"></span>
+        <span class="billsticker__arm-brush"></span>
+        <span class="billsticker__brush"></span>
+      </div>
+    }
+  </div>
+</section>

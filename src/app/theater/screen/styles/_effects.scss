@@ -1,0 +1,118 @@
+// ====================================
+// SCREEN EFFECTS - Passive Income & Ticket Storm
+// ====================================
+
+.screen {
+  // Passive Income Indicator
+  // Box Office payout: a small "+N" that rises beside the ticket count, where
+  // the income actually lands — not a glowing number across the middle of the film.
+  .passive-income-indicator {
+    position: absolute;
+    top: 56px;
+    left: 1.6rem;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 5;
+
+    &.show {
+      animation: incomeFloat 1s ease-out forwards;
+    }
+
+    .income-tick {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: #d4af5a;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+    }
+  }
+
+  @keyframes incomeFloat {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    30% {
+      opacity: 0.95;
+      transform: translateY(-2px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-22px);
+    }
+  }
+
+  // Ticket Storm Effect
+  .ticket-storm-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 4;
+  }
+
+  // Falling tickets during a ticket storm: small aged-brass slips that drift
+  // down softly, not bright neon shards.
+  .ticket-particle {
+    position: absolute;
+    width: 11px;
+    height: 7px;
+    background-color: #b9952f;
+    border-radius: 1.5px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+    animation: ticketFall 3.4s linear infinite;
+    opacity: 0.4;
+
+    &:nth-child(1) {
+      left: 12%;
+      animation-duration: 3s;
+    }
+    &:nth-child(2) {
+      left: 31%;
+      animation-duration: 3.6s;
+    }
+    &:nth-child(3) {
+      left: 50%;
+      animation-duration: 3.2s;
+    }
+    &:nth-child(4) {
+      left: 69%;
+      animation-duration: 3.8s;
+    }
+    &:nth-child(5) {
+      left: 88%;
+      animation-duration: 3.1s;
+    }
+  }
+
+  @keyframes ticketFall {
+    0% {
+      top: -20px;
+      transform: rotate(0deg) translateX(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.42;
+    }
+    50% {
+      transform: rotate(180deg) translateX(15px);
+    }
+    90% {
+      opacity: 0.42;
+    }
+    100% {
+      top: 100%;
+      transform: rotate(360deg) translateX(-10px);
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .passive-income-indicator.show,
+    .ticket-particle {
+      animation: none !important;
+    }
+  }
+}

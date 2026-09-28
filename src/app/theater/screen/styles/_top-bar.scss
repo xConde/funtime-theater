@@ -1,0 +1,239 @@
+// ====================================
+// GAME TOP BAR - Timer, Tickets, Multiplier
+// ====================================
+
+.screen {
+  // New improved layout styles
+  .game-top-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+    // Held at full alpha through the text band (icons/numbers sit vertically
+    // centered around the ~50% mark) rather than fading from the very top —
+    // a linear 0.8->transparent fade put the text at roughly half that alpha
+    // by its own center, which reads fine over a typical dark scene but drops
+    // gold #ffd700 to ~2.45:1 over a bright one. Held at 0.8 through 70%, the
+    // worst case (pure white scene behind) computes to ~9:1 — see
+    // _top-bar.scss review notes.
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.8) 70%, transparent 100%);
+    z-index: 10;
+
+    .tickets-section,
+    .timer-section {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+
+      .hud-icon {
+        width: 1.2rem;
+        height: 1.2rem;
+        flex-shrink: 0;
+        opacity: 0.8;
+      }
+
+      .score.increase {
+        position: relative;
+        margin-left: 0.5rem;
+        color: #00d632;
+        animation: scoreFloat 1s ease-out forwards;
+      }
+    }
+
+    .timer-section {
+      color: #fff;
+      transition:
+        color 0.3s ease,
+        text-shadow 0.3s ease;
+
+      &.timer-warning {
+        color: #ffd700 !important;
+        text-shadow:
+          0 2px 4px rgba(0, 0, 0, 0.8),
+          0 0 20px rgba(255, 215, 0, 0.5);
+
+        .hud-icon {
+          color: #ffd700 !important;
+          animation: timerPulse 1s ease-in-out infinite;
+        }
+
+        .timer-value {
+          animation: timerPulse 1s ease-in-out infinite;
+        }
+      }
+
+      &.timer-critical {
+        color: #ff0000 !important;
+        text-shadow:
+          0 2px 4px rgba(0, 0, 0, 0.8),
+          0 0 30px rgba(255, 0, 0, 0.6);
+
+        .hud-icon {
+          color: #ff0000 !important;
+          animation: timerPulse 0.5s ease-in-out infinite;
+        }
+
+        .timer-value {
+          animation: timerPulse 0.5s ease-in-out infinite;
+          font-size: 1.8rem;
+        }
+      }
+    }
+  }
+
+  // Multiplier Display - Centered at top
+  .multiplier-display {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    z-index: 9;
+
+    .multiplier-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #ffd700;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+      letter-spacing: 0.05em;
+    }
+
+    .multiplier.increase {
+      position: relative;
+      color: #00d632;
+      font-size: 1.2rem;
+      animation: scoreFloat 1s ease-out forwards;
+      margin-left: 0.25rem;
+    }
+  }
+
+  // Crowd mood: a small, unobtrusive gauge tucked into the bottom-left corner,
+  // in keeping with the laid-back house. Warms quietly as the audience gets into
+  // the screening; pays out as applause at the credits.
+  .mood-meter {
+    position: absolute;
+    bottom: 8px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    z-index: 8;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(4, 4, 10, 0.66);
+    border: 1px solid rgba(238, 226, 205, 0.22);
+    pointer-events: none;
+
+    .mood-label {
+      font-size: 0.52rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(238, 226, 205, 0.9);
+    }
+
+    .mood-track {
+      width: 48px;
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.22);
+      overflow: hidden;
+    }
+
+    .mood-fill {
+      height: 100%;
+      border-radius: 2px;
+      // Muted warm fill, not a bright arcade gold.
+      background: linear-gradient(90deg, #856428, #c79a45);
+      transition:
+        width 0.4s ease,
+        background 0.4s ease,
+        box-shadow 0.4s ease;
+    }
+
+    &.mood-hot .mood-fill {
+      background: linear-gradient(90deg, #c79a45, #e2c074);
+      box-shadow: 0 0 5px rgba(199, 154, 69, 0.4);
+    }
+  }
+
+  @keyframes scoreFloat {
+    0% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+  }
+
+  @keyframes multiplierPulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .game-top-bar {
+      padding: 0 1rem;
+
+      .tickets-section,
+      .timer-section {
+        font-size: 1.2rem;
+      }
+    }
+
+    .multiplier-display {
+      top: 8px;
+
+      // Prominent but not dominating — 2.5rem swamped the small mobile HUD; 1.6rem
+      // still out-sized the 1.2rem ticket/timer peers. 1.3rem keeps it the centered
+      // focal number without inverting the hierarchy.
+      .multiplier-value {
+        font-size: 1.3rem;
+      }
+    }
+
+    // Lift the gauge above the concession strip on the shorter mobile screen.
+    .mood-meter {
+      bottom: 34px;
+      left: 8px;
+
+      .mood-track {
+        width: 40px;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .game-top-bar .tickets-section .score.increase,
+    .game-top-bar .timer-section.timer-warning i,
+    .game-top-bar .timer-section.timer-warning .timer-value,
+    .game-top-bar .timer-section.timer-critical i,
+    .game-top-bar .timer-section.timer-critical .timer-value,
+    .multiplier-display .multiplier.increase {
+      animation: none !important;
+    }
+  }
+}

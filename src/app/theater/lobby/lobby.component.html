@@ -1,0 +1,343 @@
+<div
+  class="lobby-container"
+  [class.show]="show"
+  [appFocusTrap]="show"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="lobby-title"
+  tabindex="-1"
+>
+  <div class="lobby-wrapper">
+    <!-- Theater Header - 1940s Cartoon Style -->
+    <header class="theater-header">
+      <div class="theater-marquee">
+        <h1 id="lobby-title" class="theater-title">FUNTIME THEATER</h1>
+        <div class="marquee-lights">
+          <span class="light"></span>
+          <span class="light"></span>
+          <span class="light"></span>
+          <span class="light"></span>
+          <span class="light"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top Navigation Bar -->
+    <nav class="lobby-nav" aria-label="Theater lobby">
+      <div class="nav-center" role="tablist" aria-label="Lobby sections">
+        <button
+          id="lobby-tab-play"
+          type="button"
+          class="nav-tab"
+          role="tab"
+          aria-controls="lobby-panel"
+          [attr.aria-selected]="activeTab === 'play'"
+          [attr.tabindex]="activeTab === 'play' ? 0 : -1"
+          [class.active]="activeTab === 'play'"
+          (click)="changeTab('play')"
+          (keydown)="onTablistKeydown($event, 'play')"
+        >
+          Now Showing
+        </button>
+        <button
+          id="lobby-tab-shop"
+          type="button"
+          class="nav-tab"
+          role="tab"
+          aria-controls="lobby-panel"
+          [attr.aria-selected]="activeTab === 'shop'"
+          [attr.tabindex]="activeTab === 'shop' ? 0 : -1"
+          [class.active]="activeTab === 'shop'"
+          (click)="changeTab('shop')"
+          (keydown)="onTablistKeydown($event, 'shop')"
+        >
+          Concessions
+        </button>
+        <button
+          id="lobby-tab-stats"
+          type="button"
+          class="nav-tab"
+          role="tab"
+          aria-controls="lobby-panel"
+          [attr.aria-selected]="activeTab === 'stats'"
+          [attr.tabindex]="activeTab === 'stats' ? 0 : -1"
+          [class.active]="activeTab === 'stats'"
+          (click)="changeTab('stats')"
+          (keydown)="onTablistKeydown($event, 'stats')"
+        >
+          Box Office
+        </button>
+      </div>
+      <div class="nav-right">
+        <div class="player-stats">
+          <div class="level-display">
+            <span class="level-badge">Lvl {{ playerLevel > 99 ? '99+' : playerLevel }}</span>
+            <div class="level-progress-bar">
+              <div class="level-progress-fill" [style.width.%]="levelProgress"></div>
+            </div>
+          </div>
+          <span class="coin-display">
+            <svg class="ticket-icon" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+              <!-- Animated ticket -->
+              <g class="ticket-group">
+                <path d="M8 16 L56 16 L56 48 L8 48 Z" fill="#b8a070" stroke="#8a7050" stroke-width="2" />
+                <!-- Perforations -->
+                <path
+                  d="M8 16 L8 20 L12 20 L12 16 M52 16 L52 20 L56 20 L56 16 M8 44 L8 48 L12 48 L12 44 M52 44 L52 48 L56 48 L56 44"
+                  fill="#8a7050"
+                />
+                <!-- Ticket text -->
+                <text
+                  x="32"
+                  y="28"
+                  text-anchor="middle"
+                  font-size="8"
+                  font-weight="bold"
+                  fill="#5a4030"
+                  font-family="Arial Black"
+                >
+                  ADMIT
+                </text>
+                <text
+                  x="32"
+                  y="38"
+                  text-anchor="middle"
+                  font-size="6"
+                  font-weight="bold"
+                  fill="#5a4030"
+                  font-family="Arial Black"
+                >
+                  ONE
+                </text>
+                <!-- Perforated line -->
+                <line x1="20" y1="16" x2="20" y2="48" stroke="#8a7050" stroke-width="1" stroke-dasharray="2,2" />
+                <!-- Sparkles -->
+                <circle cx="14" cy="22" r="1" fill="#d4c4a0" opacity="0.5">
+                  <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2s" repeatCount="indefinite" />
+                </circle>
+                <circle cx="50" cy="42" r="1" fill="#d4c4a0" opacity="0.5">
+                  <animate attributeName="opacity" values="0.2;0.5;0.2" dur="2s" repeatCount="indefinite" />
+                </circle>
+              </g>
+            </svg>
+            {{ totalTickets }}
+          </span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main
+      class="lobby-content"
+      role="tabpanel"
+      id="lobby-panel"
+      [attr.aria-labelledby]="'lobby-tab-' + activeTab"
+      tabindex="0"
+    >
+      @switch (activeTab) {
+        <!-- Play Tab -->
+        @case ('play') {
+          <section class="play-section">
+            <app-attract-screen
+              [intermission]="hasPausedGame()"
+              (filmIndexChange)="wall.syncTo($event)"
+              (filmEnding)="wall.beginRepaint($event)"
+            />
+
+            <!-- Source order is heading, then the showtimes board, then the
+                 control that commits to a show, which is the order the copy
+                 describes and the order a keyboard or screen-reader user meets
+                 them in. The confirm button is lifted into the heading row by
+                 grid placement alone, so the lobby spends its vertical space on
+                 the board and the poster wall rather than on a row holding a
+                 single control, without the commit preceding the choices. -->
+            <div class="program-board">
+              <div class="program-intro">
+                <span class="program-intro__label">Tonight's program</span>
+                <p>
+                  Pick a show, then take your seat. Once the lights go down, catch the lit seat before time runs out.
+                </p>
+              </div>
+
+              <div class="game-modes-carousel" [class.dimmed]="hasPausedGame()">
+                @for (mode of gameModes; track mode.id) {
+                  <button
+                    type="button"
+                    class="mode-card"
+                    [disabled]="hasPausedGame()"
+                    [class.selected]="selectedMode === mode.id"
+                    [class.locked]="!mode.unlocked"
+                    [class.cant-afford]="!mode.unlocked && !canAffordMode(mode)"
+                    [class.minted]="mode.minted"
+                    [class.has-paused-game]="hasPausedGame() && getPausedGameMode() === mode.id"
+                    [attr.data-theme]="mode.theme"
+                    [attr.aria-pressed]="selectedMode === mode.id"
+                    [attr.aria-label]="modeSelectionLabel(mode)"
+                    (click)="handleModeSelection(mode)"
+                  >
+                    <!-- PAUSED badge is a direct child of .mode-card (its CSS anchor),
+                       not of the shrink-wrapped .mode-header — keeps DOM and CSS aligned. -->
+                    @if (hasPausedGame() && getPausedGameMode() === mode.id) {
+                      <span class="paused-indicator">PAUSED</span>
+                    }
+                    <div class="mode-header">
+                      <span class="mode-time">{{ mode.id === 'classic' ? 'MATINEE' : 'LATE SHOW' }}</span>
+                      <div class="mode-card__text">
+                        <h3>{{ mode.name }}</h3>
+                        <p class="mode-description">{{ mode.description }}</p>
+                      </div>
+                    </div>
+
+                    <div class="mode-footer">
+                      @if (mode.unlocked) {
+                        <div class="mode-stats">
+                          <span class="mode-status">{{ mode.highScore ? 'BEST ' + mode.highScore : 'AVAILABLE' }}</span>
+                          @if (mode.ticketMultiplier && mode.ticketMultiplier > 1) {
+                            <span class="multiplier-badge">{{ mode.ticketMultiplier }}× RECEIPTS</span>
+                          }
+                        </div>
+                      }
+                      @if (!mode.unlocked) {
+                        <div class="lock-indicator" [class.affordable]="canAffordMode(mode)">
+                          @if (!meetsLevelRequirement(mode)) {
+                            <span>LEVEL {{ mode.levelRequired }}</span>
+                          } @else {
+                            <span>{{ mode.entryFee ?? 0 }} TICKETS</span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </button>
+                }
+              </div>
+
+              <div class="program-action">
+                <button
+                  type="button"
+                  class="program-action__button"
+                  [disabled]="!canConfirmSelectedMode"
+                  (click)="confirmSelectedMode($event)"
+                >
+                  {{ selectedModeActionLabel }}
+                </button>
+              </div>
+            </div>
+
+            <app-coming-soon #wall />
+          </section>
+        }
+
+        <!-- Shop Tab -->
+        @case ('shop') {
+          <section class="shop-section">
+            <header class="counter-heading">
+              <div>
+                <span class="counter-heading__eyebrow">Concession counter</span>
+                <h2>House upgrades</h2>
+                <p>Buy between shows. Every item stays with this theater.</p>
+              </div>
+              <span class="counter-heading__balance">{{ playerTickets }} tickets on hand</span>
+            </header>
+            <div class="power-ups-showcase">
+              @for (powerUp of powerUps; track powerUp.id) {
+                <button
+                  class="power-up-item"
+                  (click)="buyPowerUp(powerUp)"
+                  [disabled]="playerTickets < powerUp.cost || isAtLevelCap(powerUp)"
+                  [class.power-up-item--maxed]="isAtLevelCap(powerUp)"
+                  [attr.aria-label]="powerUpPurchaseLabel(powerUp)"
+                >
+                  <div class="power-up-visual">
+                    <span class="power-icon" [innerHTML]="getPowerUpIconHtml(powerUp.id)"></span>
+                  </div>
+                  <div class="power-up-details">
+                    <div class="power-up-title-line">
+                      <h3>{{ powerUp.name }}</h3>
+                      <span>{{ powerUp.owned ? 'Level ' + powerUp.owned : 'Not installed' }}</span>
+                    </div>
+                    <p>{{ powerUp.description }}</p>
+                  </div>
+                  <span class="power-up-price" [class.power-up-price--short]="playerTickets < powerUp.cost">
+                    {{ powerUpPriceLabel(powerUp) }}
+                  </span>
+                </button>
+              }
+            </div>
+          </section>
+        }
+
+        <!-- Stats Tab -->
+        @case ('stats') {
+          <section class="stats-section">
+            <header class="ledger-heading">
+              <span class="ledger-heading__eyebrow">Box office ledger</span>
+              <h2>How the house is doing</h2>
+              <p>A plain look at the numbers, without making you wait for a ticker to crawl past.</p>
+            </header>
+
+            <dl class="box-office-ledger">
+              <div>
+                <dt>Star rating</dt>
+                <dd>{{ playerLevel }}</dd>
+              </div>
+              <div>
+                <dt>Tickets on hand</dt>
+                <dd>{{ totalTickets }}</dd>
+              </div>
+              <div>
+                <dt>Lifetime receipts</dt>
+                <dd>{{ totalCoinsEarned }}</dd>
+              </div>
+              <div>
+                <dt>Shows played</dt>
+                <dd>{{ getTotalGamesPlayed() }}</dd>
+              </div>
+              <div>
+                <dt>Best house</dt>
+                <dd>{{ getBestScore() }}</dd>
+              </div>
+              <div class="box-office-ledger__wide">
+                <dt>Most played</dt>
+                <dd>{{ favoriteMode }}</dd>
+              </div>
+            </dl>
+
+            <div class="achievements-section">
+              <h3>
+                Awards cabinet <span>{{ unlockedAchievements }} of {{ totalAchievements }}</span>
+              </h3>
+              <div class="achievements-grid">
+                @for (achievement of achievements; track achievement.id) {
+                  <div
+                    class="achievement-item"
+                    [class.unlocked]="achievement.unlocked"
+                    [title]="achievement.description"
+                  >
+                    <span class="achievement-icon" [innerHTML]="getAchievementIconHtml(achievement)"></span>
+                    <div class="achievement-info">
+                      <h4>{{ achievement.name }}</h4>
+                      <p>{{ achievement.description }}</p>
+                      @if (achievement.maxProgress && !achievement.unlocked) {
+                        <div class="achievement-progress">
+                          <div class="progress-bar">
+                            <div
+                              class="progress-fill"
+                              [style.width.%]="((achievement.progress || 0) / achievement.maxProgress) * 100"
+                            ></div>
+                          </div>
+                          <span class="progress-text"
+                            >{{ achievement.progress || 0 }}/{{ achievement.maxProgress }}</span
+                          >
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </section>
+        }
+      }
+    </main>
+  </div>
+</div>

@@ -1,0 +1,217 @@
+// ====================================
+// GAME MODE ANNOUNCEMENT
+// ====================================
+
+.game-starting-card {
+  position: absolute;
+  inset: 0;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  color: #f1dfb8;
+  background: #0d0908;
+  text-align: center;
+
+  span {
+    color: #bda661;
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.62rem, 1.4vw, 0.75rem);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    margin: 0.35rem 0 0;
+    color: #e8bf61;
+    font-family: 'Anton', Impact, sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.6rem);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #5e2823;
+  }
+
+  p {
+    max-width: 34rem;
+    margin: 0.35rem 0 0;
+    color: #b9aa92;
+    font-family: 'Roboto', Arial, sans-serif;
+    font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+    line-height: 1.45;
+  }
+}
+
+:host-context(.day-mode) .game-starting-card {
+  color: #3f2d25;
+  background: #e7dcc9;
+
+  span,
+  h2 {
+    color: #72502f;
+  }
+
+  h2 {
+    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.55);
+  }
+
+  p {
+    color: #665648;
+  }
+}
+
+.game-mode-announcement {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+  z-index: 100;
+  animation: announcementFadeIn 0.5s ease-out;
+}
+
+.announcement-content {
+  text-align: center;
+  position: relative;
+  padding: 1.5rem;
+  animation: announcementZoom 2.5s ease-out;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 3rem;
+  }
+}
+
+.announcement-line {
+  position: absolute;
+  width: 300px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+  left: 50%;
+  transform: translateX(-50%);
+
+  &.top {
+    top: 0;
+    animation: lineExpand 1s ease-out 0.3s both;
+  }
+
+  &.bottom {
+    bottom: 0;
+    animation: lineExpand 1s ease-out 0.5s both;
+  }
+}
+
+.mode-name {
+  font-family: 'Bebas Neue', Arial, sans-serif;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  color: #ffd700;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin: 0;
+  text-shadow:
+    0 0 30px rgba(255, 215, 0, 0.8),
+    0 0 60px rgba(255, 215, 0, 0.6),
+    0 0 90px rgba(255, 215, 0, 0.4);
+  animation: modeNameGlow 2.5s ease-out;
+}
+
+.mode-subtitle {
+  font-family: Arial, sans-serif;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  color: #fff;
+  margin: 1rem 0 0 0;
+  opacity: 0;
+  animation: subtitleFade 1s ease-out 0.8s forwards;
+}
+
+@keyframes announcementFadeIn {
+  from {
+    opacity: 0;
+    background: transparent;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes announcementZoom {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes lineExpand {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 300px;
+    opacity: 1;
+  }
+}
+
+@keyframes modeNameGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes subtitleFade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes timerPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-mode-announcement,
+  .announcement-content,
+  .announcement-line.top,
+  .announcement-line.bottom,
+  .mode-name,
+  .mode-subtitle {
+    animation: none !important;
+  }
+}

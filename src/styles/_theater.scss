@@ -1,0 +1,204 @@
+// -------------------------------------
+// Variables
+// -------------------------------------
+$background-color: #050505;
+$font-family-primary: 'Cinzel', serif;
+$font-family-secondary: 'Uncial Antiqua', cursive;
+$text-color: #ffd700; // Gold
+
+// Button Colors
+$button-play-color: #1b4d3e; // Darker Medieval Green
+$button-pause-color: #8c7339; // Dark Goldenrod
+$button-stop-color: #4a0000; // Maroon
+$button-text-color: #fff; // White
+$button-border-radius: 10px;
+
+// -------------------------------------
+// Mixins
+// -------------------------------------
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin carpet-floor {
+  background-color: #160f14;
+  background-image:
+    radial-gradient(circle, rgba(213, 170, 69, 0.16) 0 1px, transparent 1.5px),
+    linear-gradient(45deg, transparent 48%, rgba(116, 38, 43, 0.14) 49% 51%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(116, 38, 43, 0.14) 49% 51%, transparent 52%);
+  background-position:
+    0 0,
+    0 0,
+    15px 15px;
+  background-size: 30px 30px;
+  z-index: 1;
+}
+
+@mixin carpet-floor-twilight {
+  background-color: #d2c1aa;
+  background-image:
+    radial-gradient(circle, rgba(114, 80, 47, 0.17) 0 1px, transparent 1.5px),
+    linear-gradient(45deg, transparent 48%, rgba(158, 63, 56, 0.1) 49% 51%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgba(158, 63, 56, 0.1) 49% 51%, transparent 52%);
+  background-position:
+    0 0,
+    0 0,
+    15px 15px;
+  background-size: 30px 30px;
+  z-index: 1;
+}
+
+@mixin stairs-asset {
+  background: url('/svgs/stairs.svg') repeat-y center center;
+  background-repeat: repeat;
+  z-index: 10;
+}
+
+// -------------------------------------
+// A "fancy" button mixin
+// -------------------------------------
+@mixin fancy-game-button($bg-color, $text-color) {
+  background-color: $bg-color;
+  color: $text-color;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: normal;
+  border: none;
+  border-radius: $button-border-radius;
+  padding: 1.5vw 3vw;
+  text-transform: uppercase;
+  font-family: $font-family-secondary;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+
+  // Subtle text shadow for flair
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+
+  // Icons or images
+  i,
+  img {
+    display: inline-block;
+    transition:
+      transform 0.2s ease-in-out,
+      filter 0.2s ease-in-out;
+    filter: brightness(0.9);
+    vertical-align: middle;
+  }
+
+  // Hover: gentle glow & icon animation
+  &:hover {
+    box-shadow: 0 0 12px rgba($button-text-color, 0.6);
+    transform: translateY(-3px);
+
+    i,
+    img {
+      transform: scale(1.1);
+      filter: brightness(1.2);
+    }
+  }
+
+  // Active: pressed look
+  &:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  // Focus ring for accessibility
+  &:focus {
+    outline: 2px dashed lighten($bg-color, 30%);
+    outline-offset: 4px;
+  }
+}
+
+// -------------------------------------
+// Specific button styles
+// -------------------------------------
+.game-button--play {
+  @include fancy-game-button($button-play-color, $button-text-color);
+}
+
+.game-button--pause {
+  @include fancy-game-button($button-pause-color, #000); // black text
+}
+
+.game-button--stop {
+  @include fancy-game-button($button-stop-color, $button-text-color);
+}
+
+// -------------------------------------
+// Theater Wrapper and Child Elements
+// -------------------------------------
+.theater-wrapper {
+  margin-top: 0.5rem;
+  height: 82vh;
+  max-width: 100%;
+  background-color: $background-color; // Dark background for the "walls"
+
+  .theater {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    min-height: 55%;
+    height: 68vh;
+    background-color: $background-color; // Also dark for the upper area
+    overflow: hidden;
+
+    app-screen {
+      position: relative;
+      width: 90%;
+      min-height: 45%;
+    }
+
+    .floor {
+      filter: brightness(0.88) contrast(1.12);
+      flex-direction: column;
+      align-items: center;
+      flex: 1 1 auto;
+      width: 100%;
+      gap: 0.25rem;
+
+      app-seating-area {
+        width: 82%;
+        max-width: 120rem;
+        flex: 0 0 80%;
+        flex-shrink: 1;
+      }
+
+      app-entrance-area {
+        width: 72%;
+        max-width: 95rem;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  // Container for your in-game control buttons
+  .game-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+    max-width: 800px;
+    align-items: center;
+    justify-content: center;
+    height: 15vh;
+    margin: 0 auto;
+
+    .game-button {
+      flex: 1 1 auto;
+      height: 60%;
+      min-width: 100px;
+      max-width: 200px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

@@ -1,0 +1,186 @@
+// ====================================
+// POWER-UPS DISPLAY
+// ====================================
+
+.screen {
+  .power-ups-display {
+    // The concession counter: a single slim row of icon + value chips along the
+    // screen's bottom edge. It must never grow up into the film, so it stays on
+    // one line (no wrap) and clips at the edges rather than stacking — with a
+    // full concession set this is the difference between a thin strip and a
+    // block that buries the picture.
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 4px;
+    // The concession counter: a slim velvet ledge with a brass rail and a row of
+    // marquee bulbs across the top, so the owned snacks read as the lobby stand.
+    padding: 5px 10px 4px;
+    background: linear-gradient(to bottom, rgba(46, 10, 14, 0.82), rgba(14, 5, 8, 0.9));
+    border-radius: 10px;
+    border: 1px solid rgba(212, 160, 23, 0.45);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 224, 130, 0.25),
+      0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 8;
+    max-width: 96%;
+    overflow: hidden;
+
+    // Marquee bulbs along the top edge.
+    &::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 10px;
+      right: 10px;
+      height: 2px;
+      background-image: radial-gradient(circle, rgba(255, 224, 130, 0.9) 0.9px, transparent 1.4px);
+      background-size: 9px 2px;
+      background-repeat: repeat-x;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+
+  .power-up-item {
+    --chip-accent: #cbb27a; // brass, the counter's default trim
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    // A muted token on the velvet counter: the icon and a thin trim carry the
+    // concession's identity in mature, aged tones rather than arcade neon.
+    background: linear-gradient(to bottom, rgba(58, 30, 24, 0.5), rgba(30, 15, 12, 0.6));
+    border-radius: 6px;
+    border: 1px solid var(--chip-accent);
+    min-width: 0;
+    position: relative;
+    white-space: nowrap;
+    font-size: 0.7em;
+
+    // Aged, desaturated concession tones — distinct, but all of one world.
+    &.concession-golden-popcorn {
+      --chip-accent: #c9a227;
+    }
+    &.concession-box-office {
+      --chip-accent: #9c6b43;
+    }
+    &.concession-usher {
+      --chip-accent: #836a86;
+
+      &.usher-cooldown {
+        --chip-accent: #6b6b6b;
+        opacity: 0.6;
+
+        .usher-cooldown-text {
+          color: #c79a3a;
+          font-weight: bold;
+        }
+      }
+    }
+    &.concession-spotlight {
+      --chip-accent: #9a948a;
+    }
+    &.concession-fortune {
+      --chip-accent: #ad6b76;
+    }
+    &.concession-confetti {
+      --chip-accent: #6f8a5e;
+    }
+    &.concession-velvet {
+      --chip-accent: #8a6a8e;
+    }
+    &.concession-dice {
+      --chip-accent: #a85f4c;
+    }
+    &.concession-streak {
+      --chip-accent: #c0904f;
+    }
+
+    .hud-icon {
+      width: 0.95rem;
+      height: 0.95rem;
+      color: var(--chip-accent);
+      filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.7));
+      flex-shrink: 0;
+    }
+
+    .power-up-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1px;
+
+      // The icon identifies the concession; the full name lives in the lobby
+      // shop, so in-game we show only the live value to keep the strip thin.
+      .power-up-name {
+        display: none;
+      }
+
+      .power-up-effect {
+        font-size: 0.62rem;
+        color: rgba(255, 255, 255, 0.85);
+        text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .power-up-item.pulsing {
+    animation: powerUpPulse 1s ease-in-out infinite;
+  }
+
+  @keyframes powerUpPulse {
+    0%,
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.6);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: 768px) {
+    .power-ups-display {
+      bottom: 6px;
+      padding: 3px 6px;
+      gap: 3px;
+      max-width: 92%;
+    }
+
+    .power-up-item {
+      padding: 3px 6px;
+      min-width: 0;
+
+      .hud-icon {
+        width: 1rem;
+        height: 1rem;
+      }
+
+      .power-up-info {
+        .power-up-name {
+          font-size: 0.75rem;
+        }
+
+        .power-up-effect {
+          font-size: 0.65rem;
+        }
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .power-up-item,
+    .power-up-item.pulsing {
+      animation: none !important;
+    }
+  }
+}

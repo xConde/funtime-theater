@@ -1,0 +1,20 @@
+<div class="attract-screen">
+  <div class="attract-plaque">
+    <span class="attract-eyebrow" [class.attract-eyebrow--intermission]="intermission()">{{
+      intermission() ? '· · ·  INTERMISSION  · · ·' : 'NOW SHOWING'
+    }}</span>
+    @if (currentFilm()) {
+      <h2 class="attract-title">{{ currentFilm()!.title }}</h2>
+      <p class="attract-tagline">{{ currentFilm()!.tagline }}</p>
+    }
+  </div>
+  <div class="attract-frame" #frameEl>
+    <canvas #canvasEl [attr.width]="sceneWidth" [attr.height]="sceneHeight"></canvas>
+  </div>
+  @if (currentFilm()) {
+    <p class="attract-credits">
+      starring {{ currentFilm()!.starring }} &middot; directed by {{ currentFilm()!.directedBy }} &middot;
+      {{ currentFilm()!.year }}
+    </p>
+  }
+</div>

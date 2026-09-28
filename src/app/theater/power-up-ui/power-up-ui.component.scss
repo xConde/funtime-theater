@@ -1,0 +1,222 @@
+@use 'variables' as *;
+
+.power-ups-container {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  z-index: 50;
+}
+
+.power-up-item {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px #1a1a1a,
+      0 0 0 4px #ffd700;
+  }
+
+  &:hover:not(.disabled) {
+    transform: translateY(-3px) scale(1.1);
+    border-color: #ffd700;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+  }
+
+  &.active {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #ffd700;
+    animation: pulse 1s ease-in-out infinite;
+
+    .power-up-icon {
+      color: #ffd700;
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+    }
+  }
+
+  &.permanent {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 140, 0, 0.2));
+    border-color: #ffd700;
+    cursor: default;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+
+    .power-up-icon {
+      color: #ffd700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    }
+  }
+
+  .power-up-icon {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+
+  .power-up-count {
+    font-size: 0.8rem;
+    color: #ffd700;
+    font-weight: bold;
+  }
+
+  .power-up-effect {
+    font-size: 0.65rem;
+    color: #fff;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.1;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+
+  .power-up-active {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ffd700;
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    animation: bounce 0.5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-3px);
+  }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+  .power-ups-container {
+    bottom: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .power-up-item {
+    width: 50px;
+    height: 50px;
+
+    .power-up-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Warm Matinee Palette
+// ============================================
+
+:host-context(.day-mode) {
+  .power-up-item {
+    background: rgba(250, 248, 243, 0.9);
+    border: 2px solid rgba(109, 76, 65, 0.25);
+
+    &:hover:not(.disabled) {
+      transform: translateY(-3px) scale(1.1);
+      border-color: rgba(109, 76, 65, 0.4);
+      box-shadow: 0 5px 15px rgba(109, 76, 65, 0.15);
+    }
+
+    &.active {
+      background: rgba(212, 172, 13, 0.15); // Warm amber active
+      border-color: #b7950b;
+
+      .power-up-icon {
+        color: #b7950b;
+      }
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      background: rgba(109, 76, 65, 0.05);
+      border-color: rgba(109, 76, 65, 0.15);
+
+      &:hover {
+        transform: none;
+      }
+    }
+
+    &.permanent {
+      background: linear-gradient(135deg, rgba(212, 172, 13, 0.15), rgba(183, 149, 11, 0.12));
+      border-color: #b7950b;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+
+      .power-up-icon {
+        color: #9a7b0a;
+        text-shadow: 0 0 10px rgba(212, 172, 13, 0.3);
+      }
+    }
+
+    .power-up-icon {
+      color: #4e342e;
+    }
+
+    .power-up-count {
+      color: #9a7b0a; // Warm amber-brown
+    }
+
+    .power-up-effect {
+      color: #4e342e;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .power-up-active {
+      background: #b7950b; // Warm amber
+      color: #fff;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .power-up-item.active,
+  .power-up-item .power-up-active {
+    animation: none !important;
+  }
+}

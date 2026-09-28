@@ -1,0 +1,156 @@
+// ====================================
+// SCREEN BASE - Container & Core Styles
+// ====================================
+@use 'sass:color';
+@use 'screen' as s;
+@use 'variables' as *;
+
+.screen-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #000;
+}
+
+.screen {
+  position: relative;
+  width: 92%;
+  height: 88%;
+  max-width: 110rem;
+  background-color: black;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: auto; // Center in container
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+
+  &.game-active {
+    // Warm, dim house glow rather than an arcade green. Overridden by the
+    // (now muted) level glow once the player starts scoring.
+    border-color: rgba(201, 162, 39, 0.26);
+    box-shadow: 0 0 14px rgba(140, 100, 40, 0.16);
+
+    @include s.color-level-styles(20);
+  }
+
+  &.game-ended {
+    border-color: rgba(255, 59, 48, 0.5);
+    box-shadow: 0 0 15px rgba(255, 59, 48, 0.3);
+    background-color: #000; // Ensure black background for game over
+  }
+
+  &.pulse-animation {
+    animation: pulseAnimation 0.6s ease-in-out forwards;
+  }
+
+  .sound-toggle {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.8);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    // Gold focus-visible sweep: no focus-visible rule existed here at all,
+    // so a keyboard user tabbing to the mute button during Playing saw only
+    // the browser's native default ring. Matches the house double-ring
+    // convention (see `@mixin focus-ring` in theater's styles/_design-system.scss).
+    &:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 2px var(--bg-color, #141414),
+        0 0 0 4px #ffd700;
+    }
+
+    &.muted {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .hud-icon {
+      width: 0.9rem;
+      height: 0.9rem;
+      flex-shrink: 0;
+
+      svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+    }
+  }
+
+  .score,
+  .timer,
+  .hover,
+  .multiplier {
+    @include s.common-styles;
+  }
+
+  .hover {
+    top: 40%;
+    left: 10px;
+
+    @media (max-width: 768px) {
+      display: none !important;
+    }
+  }
+
+  .score {
+    top: 10px;
+    right: 10px;
+    display: none; // Hidden when using new layout
+  }
+
+  .timer {
+    bottom: 10px;
+    right: 10px;
+    display: none; // Hidden when using new layout
+  }
+
+  .multiplier {
+    bottom: 10px;
+    left: 10px;
+    display: none; // Hidden when using new layout
+  }
+
+  .increase {
+    @include s.increase-animation(0.6s);
+
+    &.score {
+      top: 15px;
+      right: 0;
+    }
+
+    &.multiplier {
+      bottom: 15px;
+      left: 15px;
+    }
+  }
+
+  // Include the color-level styles
+  @include s.color-level-styles(20);
+}

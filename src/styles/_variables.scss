@@ -1,0 +1,130 @@
+$night-background: #161718;
+$day-background: #fbf6e9; // Subtly darker vintage cream - A24-style minimal base
+
+$night-color: #ffffff;
+$night-text-area-color: lighten($night-background, 5%);
+$night-spinner: darken($day-background, 10%);
+$night-border: rgba(255, 255, 255, 0.2);
+$night-dramatic-border: lighten($night-border, 25%);
+$night-autofill: #454546; // Solid equivalent of white 20% tint on dark background (for autofill)
+
+$day-color: #2f4f4f; // Dark slate - high contrast (11.5:1)
+$day-text-area-color: $day-background; // Match background - borders define elements
+$day-spinner: lighten($night-background, 10%);
+$day-border: rgba(47, 79, 79, 0.15); // Subtle base border
+$day-dramatic-border: rgba(47, 79, 79, 0.4); // Clear, intentional border for interactive elements
+$day-autofill: #e8e8e0; // Solid equivalent of dark slate 15% tint on cream background (for autofill)
+
+$successColor: #2e7d32;
+$errorColor: #c62828;
+
+// Breakpoints
+$bp-small: 375px;
+$bp-phone: 480px;
+$bp-mobile: 768px;
+$bp-tablet: 1024px;
+
+// Layout
+$content-max-width: 1400px;
+$card-gap: 1.5rem;
+$section-gap: 2.5rem;
+
+// Persistent-UI right-edge inset for the route-outlet wrapper. Pulls the
+// webkit scrollbar in from the viewport edge so its right edge clears the
+// header's day/night toggle column on laptop viewports (the toggle's left
+// edge sits ~64px from the viewport edge). Used as both margin-right
+// (narrows the wrapper → moves the scrollbar) and padding-left (compensates
+// so the gallery stays centered at the same viewport position).
+$shell-scrollbar-inset: 4.5rem;
+
+// Border radii — $radius-chip is the persistent-UI standard (PR #190);
+// $radius-md is for legacy form/button/scrollbar surfaces.
+$radius-chip: 3px;
+$radius-md: 4px;
+
+// Remaining radii on the shell's 2px step. $radius-button is the one off-grid
+// survivor (the global `button` rule predates the grid); it is kept at its
+// rendered value rather than snapped, so tokenizing stays pixel-neutral.
+$radius-xs: 2px;
+$radius-lg: 6px;
+$radius-xl: 8px;
+$radius-2xl: 10px;
+$radius-circle: 50%;
+$radius-button: 5px;
+
+// Vintage poster brand palette — bold & saturated, used across landing,
+// contact, footer hex, pitch CTAs. Keep theme tokens (day/night) above for
+// chrome/text; these accents are for hero/CTA surfaces.
+$burnt-orange: #ff6b35;
+$fire-red: #d62828;
+$golden-yellow: #fcbf49;
+$deep-forest: #003d2e;
+$vintage-cream: #fbf6e9;
+$ink-black: #0a0a0a;
+$rust-orange: #e85d04;
+
+// Shared transition for the landing "mood-shift" (imagine→develop hover):
+// rust-orange ↔ golden-yellow on night, fire-red ↔ rust-orange on day.
+// Surfaces that participate in that palette swing share this timing so the
+// page reads as one transition, not many.
+$interactive-transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Direct-feedback timing for hover/focus on buttons, chips and tabs. Distinct
+// from $interactive-transition on purpose: the mood-shift is slow and ambient,
+// a button press has to answer immediately. Same easing keeps them related.
+$transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+// Day/night theme-switch timing. Every surface that recolors on a theme flip
+// MUST share this exact value: anything slower keeps animating after the rest
+// of the page has settled and re-rasterizes late, which reads as a flicker
+// (see the footer's border-color regression noted in footer.component.scss).
+// Lives here rather than in styles.scss so components can reach it instead of
+// re-typing the literal and drifting.
+$transition-theme: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+// --- Shell type & spacing scales -------------------------------------------
+// The `$shell-` prefix is load-bearing, NOT decoration. Several lazy projects
+// ship their own token partials that already claim the bare names — theater's
+// lobby/_lobby-variables.scss defines $space-xs…$space-xl and its
+// styles/_design-system.scss defines $text-base. Sass raises "This variable is
+// available from multiple global modules" the moment one file does
+// `@use 'variables' as *` alongside such a partial (theater's lobby does
+// exactly that), so unprefixed names here break the build. Matches the
+// existing $shell-scrollbar-inset above. Do not drop the prefix.
+//
+// Type scale. These stay `calc()` expressions over the global --font-size
+// custom property rather than baked rem values, because --font-size is fluid
+// (styles.scss) AND overridden per-context (the gallery narrows it in
+// projects.component.scss). Resolving the var() at the use site is what lets
+// those local overrides keep flowing through.
+$shell-text-3xs: calc(var(--font-size) * 0.6);
+$shell-text-2xs: calc(var(--font-size) * 0.7);
+$shell-text-xs: calc(var(--font-size) * 0.8);
+$shell-text-sm: calc(var(--font-size) * 0.85);
+$shell-text-md: calc(var(--font-size) * 0.9);
+$shell-text-base: var(--font-size);
+$shell-text-lg: calc(var(--font-size) * 1.05);
+$shell-text-xl: calc(var(--font-size) * 1.2);
+$shell-text-2xl: calc(var(--font-size) * 1.55);
+$shell-text-3xl: calc(var(--font-size) * 2.2);
+$shell-text-4xl: calc(var(--font-size) * 2.6);
+
+// Two more steps used verbatim (not on the size-name ladder above) by the global
+// h2 rule and by repeated "label" text (form labels, drawer highlights/FAQ answer
+// copy) — named here so every use draws from one source instead of each site
+// hand-repeating the same literal.
+$shell-text-h2: calc(var(--font-size) * 1.65);
+$shell-text-label: calc(var(--font-size) * 0.77);
+
+// Spacing scale — the 0.25rem grid the shell already converged on by hand.
+// Applied to single-value declarations; multi-value shorthands
+// (`padding: 1rem 2rem`) stay literal, since naming each side separately reads
+// worse than the shorthand and one-off nudges belong there.
+$shell-space-3xs: 0.25rem;
+$shell-space-2xs: 0.5rem;
+$shell-space-xs: 0.75rem;
+$shell-space-sm: 1rem;
+$shell-space-md: 1.25rem;
+$shell-space-lg: 1.5rem;
+$shell-space-xl: 2rem;
+$shell-space-2xl: 3rem;

@@ -1,0 +1,272 @@
+<div
+  class="seat-wrapper"
+  [class.active]="isActive"
+  [class.clicked]="isClicked"
+  [class.auto-clicked]="isAutoClicked"
+  [class.magnetic-range]="isMagneticRange"
+  [attr.data-seat-key]="side + '-' + rowIndex + '-' + seatIndex"
+  [attr.tabindex]="isTabStop ? 0 : -1"
+  [attr.aria-label]="
+    (isActive ? 'Active target, ' : '') +
+    'Seat ' +
+    seatIndex +
+    ', ' +
+    side +
+    ' side, Row ' +
+    rowIndex +
+    (showSoda ? ', with a soda' : '') +
+    (showPopcorn ? ', and a popcorn' : '')
+  "
+  (mouseenter)="emitEvent('hover')"
+  (mouseleave)="emitEventLeave()"
+  (focus)="seatFocused.emit(mutatedSeat)"
+  (click)="emitEvent('select')"
+  (keydown.enter)="onActivate($event)"
+  (keydown.space)="onActivate($event)"
+  (keydown.arrowleft)="onNavigate($event, 'left')"
+  (keydown.arrowright)="onNavigate($event, 'right')"
+  (keydown.arrowup)="onNavigate($event, 'up')"
+  (keydown.arrowdown)="onNavigate($event, 'down')"
+  (keydown.home)="onNavigate($event, 'home')"
+  (keydown.end)="onNavigate($event, 'end')"
+  role="button"
+  aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Home End Enter Space"
+  [attr.aria-current]="isActive ? 'true' : null"
+>
+  <!-- The seats are seen from behind: the audience faces the screen, so each
+       chair shows its padded back with the tops of its armrests, and a patron's
+       head (drawn by the patron layer) rises over the headrest. -->
+
+  <!-- DARK MODE CHAIR -->
+  @if (!isDayMode) {
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" class="seat" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient [attr.id]="svgId('gradient')" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: #74171d; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #551015; stop-opacity: 1" />
+        </linearGradient>
+        <linearGradient [attr.id]="svgId('gradient-active')" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: #dcc77f; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #b78932; stop-opacity: 1" />
+        </linearGradient>
+        <filter [attr.id]="svgId('shadow')" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3" />
+          <feOffset dx="0" dy="2" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.3" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g class="chair-svg" [attr.filter]="svgUrl('shadow')">
+        @if (isActive) {
+          <!-- A low aisle-light spill grounds the target in the room instead
+               of wrapping it in a generic interface rectangle. -->
+          <ellipse class="target-floor-glow" cx="150" cy="131" rx="56" ry="6" fill="#d2a23e" opacity="0.24" />
+        }
+
+        <!-- Cast-iron standards and walnut arm caps, seen from the aisle behind. -->
+        <path class="chair-standard" d="M 69,122 L 72,87 Q 73,81 80,81 L 91,81 L 91,122 Z" fill="#13100f" />
+        <path class="chair-standard" d="M 209,122 L 209,81 L 220,81 Q 227,81 228,87 L 231,122 Z" fill="#13100f" />
+        <rect class="chair-arm-cap" x="65" y="78" width="31" height="10" rx="4" fill="#35201a" />
+        <rect class="chair-arm-cap" x="204" y="78" width="31" height="10" rx="4" fill="#35201a" />
+        <path class="chair-base" d="M 91,118 L 209,118 L 216,128 L 84,128 Z" fill="#171515" />
+        <rect x="103" y="126" width="8" height="7" rx="1" fill="#272323" />
+        <rect x="189" y="126" width="8" height="7" rx="1" fill="#272323" />
+
+        <!-- A low dark shell and matte oxblood inset echo the limited-colour
+             poster art used throughout the lobby instead of reading as a
+             glossy collectible icon. -->
+        <path
+          class="seat-shell"
+          d="M 84,119 L 87,62 Q 88,43 110,38 Q 150,29 190,38 Q 212,43 213,62 L 216,119 Q 182,126 150,126 Q 118,126 84,119 Z"
+          fill="#241412"
+          stroke="#0d0807"
+          stroke-width="2"
+        />
+        @if (isActive) {
+          <!-- The redundant static target cue follows the furniture itself,
+               so reduced-motion players retain a crisp non-rectangular mark. -->
+          <path
+            class="seat-active-rim"
+            d="M 84,119 L 87,62 Q 88,43 110,38 Q 150,29 190,38 Q 212,43 213,62 L 216,119 Q 182,126 150,126 Q 118,126 84,119 Z"
+            fill="none"
+            stroke="#ead9a1"
+            stroke-width="2.5"
+          />
+        }
+        <path
+          class="seat-back"
+          d="M 96,111 L 101,66 Q 103,53 120,48 Q 150,40 180,48 Q 197,53 199,66 L 204,111 Q 177,119 150,119 Q 123,119 96,111 Z"
+          [attr.fill]="isActive ? svgUrl('gradient-active') : svgUrl('gradient')"
+          [attr.stroke]="isActive ? '#765616' : '#360c11'"
+          stroke-width="1.5"
+        />
+        <path
+          class="seat-back-channel"
+          d="M 108,74 Q 150,80 192,74"
+          fill="none"
+          [attr.stroke]="isActive ? '#79601f' : '#2d090d'"
+          stroke-width="1.5"
+          opacity="0.36"
+        />
+        <path
+          class="seat-back-channel"
+          d="M 104,94 Q 150,100 196,94"
+          fill="none"
+          [attr.stroke]="isActive ? '#79601f' : '#2d090d'"
+          stroke-width="1.5"
+          opacity="0.3"
+        />
+        <path d="M 121,49 Q 150,42 179,49" fill="none" stroke="#a64146" stroke-width="1.5" opacity="0.28" />
+
+        @if (showSoda) {
+          <!-- Drink in the armrest cup holder, poking up beside the seat back -->
+          <g transform="translate(222, 80)">
+            <path d="M -5,0 L -4,-18 L 4,-18 L 5,0 Z" fill="#1e90ff" stroke="#0066cc" stroke-width="1" />
+            <ellipse cx="0" cy="-18" rx="5" ry="1.8" fill="#ffffff" stroke="#cccccc" stroke-width="0.5" />
+            <rect x="-1" y="-27" width="2" height="11" fill="#ff3030" />
+          </g>
+        }
+
+        @if (showPopcorn) {
+          <defs>
+            <pattern [attr.id]="svgId('popcorn')" patternUnits="userSpaceOnUse" width="4" height="4">
+              <rect width="2" height="4" fill="#ff0000" />
+              <rect x="2" width="2" height="4" fill="#ffffff" />
+            </pattern>
+          </defs>
+          <!-- Popcorn tub poking up from the left armrest holder (the drink rides
+               the right), so both concessions read from behind the seat -->
+          <g transform="translate(79, 80)">
+            <path
+              d="M -9,0 L -7,-17 L 7,-17 L 9,0 Z"
+              [attr.fill]="svgUrl('popcorn')"
+              stroke="#cc0000"
+              stroke-width="1"
+            />
+            <circle cx="-4" cy="-16" r="2.8" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="0" cy="-18" r="3.2" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="4" cy="-17" r="2.8" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="-1" cy="-20" r="2.6" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+          </g>
+        }
+      </g>
+    </svg>
+  }
+
+  <!-- LIGHT MODE CHAIR - Warm Matinee Velvet Theater Seats -->
+  @if (isDayMode) {
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 150" class="seat" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient [attr.id]="svgId('gradient-light')" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: #9b3934; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #712521; stop-opacity: 1" />
+        </linearGradient>
+        <linearGradient [attr.id]="svgId('gradient-active-light')" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color: #d9bf72; stop-opacity: 1" />
+          <stop offset="100%" style="stop-color: #ac7b2e; stop-opacity: 1" />
+        </linearGradient>
+        <filter [attr.id]="svgId('shadow-light')" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="2.5" />
+          <feOffset dx="0" dy="2" result="offsetblur" />
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.35" />
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g class="chair-svg" [attr.filter]="svgUrl('shadow-light')">
+        @if (isActive) {
+          <ellipse class="target-floor-glow" cx="150" cy="131" rx="56" ry="6" fill="#aa781f" opacity="0.2" />
+        }
+
+        <path class="chair-standard" d="M 69,122 L 72,87 Q 73,81 80,81 L 91,81 L 91,122 Z" fill="#4b332c" />
+        <path class="chair-standard" d="M 209,122 L 209,81 L 220,81 Q 227,81 228,87 L 231,122 Z" fill="#4b332c" />
+        <rect class="chair-arm-cap" x="65" y="78" width="31" height="10" rx="4" fill="#654236" />
+        <rect class="chair-arm-cap" x="204" y="78" width="31" height="10" rx="4" fill="#654236" />
+        <path class="chair-base" d="M 91,118 L 209,118 L 216,128 L 84,128 Z" fill="#4e342e" />
+        <rect x="103" y="126" width="8" height="7" rx="1" fill="#67483d" />
+        <rect x="189" y="126" width="8" height="7" rx="1" fill="#67483d" />
+
+        <path
+          class="seat-shell"
+          d="M 84,119 L 87,62 Q 88,43 110,38 Q 150,29 190,38 Q 212,43 213,62 L 216,119 Q 182,126 150,126 Q 118,126 84,119 Z"
+          fill="#51352e"
+          stroke="#39231e"
+          stroke-width="2"
+        />
+        @if (isActive) {
+          <path
+            class="seat-active-rim"
+            d="M 84,119 L 87,62 Q 88,43 110,38 Q 150,29 190,38 Q 212,43 213,62 L 216,119 Q 182,126 150,126 Q 118,126 84,119 Z"
+            fill="none"
+            stroke="#705217"
+            stroke-width="2.5"
+          />
+        }
+        <path
+          class="seat-back"
+          d="M 96,111 L 101,66 Q 103,53 120,48 Q 150,40 180,48 Q 197,53 199,66 L 204,111 Q 177,119 150,119 Q 123,119 96,111 Z"
+          [attr.fill]="isActive ? svgUrl('gradient-active-light') : svgUrl('gradient-light')"
+          [attr.stroke]="isActive ? '#785012' : '#62201b'"
+          stroke-width="1.5"
+        />
+        <path
+          class="seat-back-channel"
+          d="M 108,74 Q 150,80 192,74"
+          fill="none"
+          [attr.stroke]="isActive ? '#805518' : '#5e1c18'"
+          stroke-width="1.5"
+          opacity="0.34"
+        />
+        <path
+          class="seat-back-channel"
+          d="M 104,94 Q 150,100 196,94"
+          fill="none"
+          [attr.stroke]="isActive ? '#805518' : '#5e1c18'"
+          stroke-width="1.5"
+          opacity="0.28"
+        />
+        <path d="M 121,49 Q 150,42 179,49" fill="none" stroke="#d07a72" stroke-width="1.5" opacity="0.32" />
+
+        @if (showSoda) {
+          <g transform="translate(222, 80)">
+            <path d="M -5,0 L -4,-18 L 4,-18 L 5,0 Z" fill="#1e90ff" stroke="#0066cc" stroke-width="1" />
+            <ellipse cx="0" cy="-18" rx="5" ry="1.8" fill="#ffffff" stroke="#cccccc" stroke-width="0.5" />
+            <rect x="-1" y="-27" width="2" height="11" fill="#ff3030" />
+          </g>
+        }
+
+        @if (showPopcorn) {
+          <defs>
+            <pattern [attr.id]="svgId('popcorn-light')" patternUnits="userSpaceOnUse" width="4" height="4">
+              <rect width="2" height="4" fill="#ff0000" />
+              <rect x="2" width="2" height="4" fill="#ffffff" />
+            </pattern>
+          </defs>
+          <g transform="translate(79, 80)">
+            <path
+              d="M -9,0 L -7,-17 L 7,-17 L 9,0 Z"
+              [attr.fill]="svgUrl('popcorn-light')"
+              stroke="#cc0000"
+              stroke-width="1"
+            />
+            <circle cx="-4" cy="-16" r="2.8" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="0" cy="-18" r="3.2" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="4" cy="-17" r="2.8" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+            <circle cx="-1" cy="-20" r="2.6" fill="#fffacd" stroke="#ffec8b" stroke-width="0.5" />
+          </g>
+        }
+      </g>
+    </svg>
+  }
+</div>

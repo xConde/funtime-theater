@@ -1,0 +1,262 @@
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Matinee Theater Palette
+// Warmer, dimmer aesthetic like a daytime theater screening
+// ============================================
+@use 'sass:color';
+@use 'variables' as *;
+
+// Matinee-specific colors (dimmer than standard day mode)
+$matinee-screen-bg: #e5ddd0; // Warm taupe for screen area
+$matinee-screen-light: #ede6db; // Slightly lighter for gradients
+
+:host-context(.day-mode) {
+  .screen-container {
+    background-color: $matinee-screen-bg;
+    border-radius: 12px;
+    border: 2px solid rgba(109, 76, 65, 0.18);
+    box-shadow:
+      0 2px 8px rgba(78, 52, 46, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .screen {
+    background: linear-gradient(to bottom, $matinee-screen-light, #e0d8cb);
+    border: 2px solid rgba(109, 76, 65, 0.18);
+    border-radius: 10px;
+    box-shadow:
+      0 2px 8px rgba(78, 52, 46, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+    &.game-active {
+      border-color: rgba(212, 172, 13, 0.4);
+      box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 0 12px rgba(212, 172, 13, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    &.game-ended {
+      border-color: rgba(146, 43, 33, 0.4);
+      box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.06),
+        0 0 12px rgba(146, 43, 33, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      background: linear-gradient(to bottom, #ede6db, #e0d8cb);
+    }
+  }
+
+  // Top Game Bar / Multiplier Display - Light Mode
+  // The tickets/timer/multiplier chips used to sit inside a translucent
+  // rgba(245,240,232,.95) card with a backdrop-filter blur — a blur with no
+  // visible effect at 95% opacity, and a card dark mode never had. This strip
+  // overlays the film canvas (genre-driven content, not day/night-themed) on
+  // the same dark .game-top-bar scrim in both themes, so it now matches dark
+  // mode's plain glowing text (see _top-bar.scss) instead of carrying its own
+  // day treatment. Only the non-card accents that were never part of that
+  // pill — the floating score/multiplier increase colors — stay day-specific.
+  .game-top-bar {
+    .tickets-section,
+    .timer-section {
+      .score.increase {
+        color: #b7950b;
+      }
+    }
+  }
+
+  .multiplier-display {
+    .multiplier.increase {
+      color: #b7950b;
+    }
+  }
+
+  // Power-ups Display - Light Mode
+  .power-ups-display {
+    background: rgba(109, 76, 65, 0.08);
+    border: 2px solid rgba(109, 76, 65, 0.25);
+    box-shadow:
+      0 2px 8px rgba(109, 76, 65, 0.12),
+      0 0 0 rgba(109, 76, 65, 0);
+  }
+
+  .power-up-item {
+    background: linear-gradient(135deg, rgba(109, 76, 65, 0.12), rgba(78, 52, 46, 0.08));
+    border: 1px solid rgba(109, 76, 65, 0.3);
+    animation: none; // Disable gold powerUpGlow — keyframe overrides all backgrounds
+    box-shadow: 0 0 4px rgba(109, 76, 65, 0.12);
+
+    &.pulsing {
+      animation: none; // Disable gold powerUpPulse
+      box-shadow: 0 0 8px rgba(183, 149, 11, 0.35);
+    }
+
+    &.concession-golden-popcorn {
+      background: linear-gradient(135deg, rgba(212, 172, 13, 0.2), rgba(183, 149, 11, 0.15));
+      border-color: #b7950b;
+    }
+
+    &.concession-box-office {
+      background: linear-gradient(135deg, rgba(109, 76, 65, 0.2), rgba(78, 52, 46, 0.15));
+      border-color: #6d4c41;
+    }
+
+    &.concession-usher {
+      background: linear-gradient(135deg, rgba(121, 85, 72, 0.2), rgba(93, 64, 55, 0.15));
+      border-color: #795548;
+
+      &.usher-cooldown {
+        opacity: 0.5;
+        background: linear-gradient(135deg, rgba(158, 158, 158, 0.2), rgba(117, 117, 117, 0.15));
+        border-color: #999;
+
+        .hud-icon {
+          color: #666;
+        }
+      }
+    }
+
+    &.concession-spotlight {
+      background: linear-gradient(135deg, rgba(244, 208, 63, 0.2), rgba(212, 172, 13, 0.15));
+      border-color: #d4ac0d;
+    }
+
+    &.concession-fortune {
+      background: linear-gradient(135deg, rgba(169, 50, 38, 0.15), rgba(146, 43, 33, 0.1));
+      border-color: #a93226;
+    }
+
+    &.concession-confetti {
+      background: linear-gradient(135deg, rgba(212, 172, 13, 0.2), rgba(183, 149, 11, 0.15));
+      border-color: #b7950b;
+    }
+
+    &.concession-velvet {
+      background: linear-gradient(135deg, rgba(123, 31, 162, 0.15), rgba(156, 39, 176, 0.1));
+      border-color: #7b1fa2;
+    }
+
+    &.concession-dice {
+      background: linear-gradient(135deg, rgba(211, 47, 47, 0.15), rgba(244, 67, 54, 0.1));
+      border-color: #d32f2f;
+    }
+
+    &.concession-streak {
+      background: linear-gradient(135deg, rgba(230, 126, 34, 0.2), rgba(211, 84, 0, 0.15));
+      border-color: #e67e22;
+    }
+
+    .hud-icon {
+      color: #4e342e;
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+    }
+
+    .power-up-info {
+      .power-up-name {
+        color: #4e342e;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.4);
+      }
+
+      .power-up-effect {
+        color: rgba(78, 52, 46, 0.8);
+        text-shadow: none;
+      }
+    }
+  }
+
+  // Game Over Screen - Light Mode
+  .game-over {
+    background: rgba(237, 230, 219, 0.98) !important;
+    border: 2px solid rgba(109, 76, 65, 0.22) !important;
+    box-shadow: 0 8px 24px rgba(78, 52, 46, 0.15) !important;
+
+    h2 {
+      color: #6d4c41 !important;
+    }
+
+    .new-high-score {
+      color: #b7950b !important;
+      text-shadow: none !important;
+    }
+
+    .final-score {
+      color: #b7950b !important;
+
+      .earned {
+        color: rgba(154, 123, 10, 0.8) !important;
+      }
+    }
+  }
+
+  // Idle Screen - Light Mode
+  .idle-screen {
+    background: $matinee-screen-bg;
+
+    &__caption {
+      color: rgba(78, 52, 46, 0.35);
+    }
+  }
+
+  // Game Mode Announcement - Light Mode
+  .game-mode-announcement {
+    background: rgba(0, 0, 0, 0.25);
+  }
+
+  .announcement-content {
+    background: rgba(237, 230, 219, 0.97);
+    border: 2px solid rgba(109, 76, 65, 0.22);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(78, 52, 46, 0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .mode-name {
+    color: #6d4c41;
+    text-shadow: none;
+  }
+
+  .announcement-line {
+    display: none;
+  }
+
+  .mode-subtitle {
+    color: #4e342e;
+  }
+
+  // Passive Income Indicator - Light Mode
+  .passive-income-indicator {
+    .income-tick {
+      color: #b7950b;
+      text-shadow:
+        0 0 8px rgba(212, 172, 13, 0.5),
+        0 0 16px rgba(212, 172, 13, 0.3);
+    }
+  }
+
+  // Ticket Storm - Light Mode
+  .ticket-particle {
+    background-color: #b7950b;
+  }
+
+  // Sound Toggle - Light Mode
+  .screen .sound-toggle {
+    background: rgba(109, 76, 65, 0.12);
+    border-color: rgba(109, 76, 65, 0.2);
+    color: #6d4c41;
+
+    &:hover {
+      background: rgba(109, 76, 65, 0.2);
+      border-color: rgba(109, 76, 65, 0.35);
+    }
+
+    &.muted {
+      color: rgba(109, 76, 65, 0.4);
+    }
+  }
+
+  // Spotlight Effect - Light Mode
+  .screen.game-active {
+    &::before {
+      background: radial-gradient(circle, rgba(212, 172, 13, 0.15) 0%, transparent 70%);
+    }
+  }
+}

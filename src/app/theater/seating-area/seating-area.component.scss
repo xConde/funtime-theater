@@ -1,0 +1,350 @@
+@use 'theater' as *;
+@use 'variables' as *;
+
+$total-rows: 10;
+
+.seating-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  padding: 0 0.75rem 0.5rem; // Prevent seat clipping, add bottom padding for doors
+
+  .stairs {
+    @include stairs-asset;
+    position: relative;
+    flex: 0 0 auto;
+    height: 100%;
+
+    .lights {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+
+      &:before,
+      &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 0.25rem;
+        height: 0.25rem;
+        border-radius: 50%;
+        background-color: #f3e5ab;
+        box-shadow: 0 0 8px #f3e5ab;
+        transform: translateY(-50%);
+      }
+
+      &:before {
+        left: 0%;
+      }
+
+      &:after {
+        right: 0%;
+      }
+    }
+
+    .hand-rail {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      background-color: #333;
+      transform: translateX(-50%);
+
+      &:before,
+      &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 0.15rem;
+        height: 75%;
+        background-color: #f3e5ab;
+        transform: translateY(-50%);
+        opacity: 0.45;
+      }
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+  }
+
+  .row {
+    @include carpet-floor;
+    display: flex;
+    justify-content: space-between;
+    min-height: 3.25rem;
+    width: 100%;
+    // No clipping at all: rows are perspective-scaled (inline transform),
+    // so any overflow clip lands mid-screen and cuts the active chair's
+    // warm halo at a visible hard edge. The wall-sconce pools below are
+    // self-contained gradients, so nothing needs the clip anymore.
+    overflow: visible;
+    flex: 1 1 0; // Per-row growth creates shallow depth without fixed heights
+    transform-origin: center center;
+
+    // Each scaled row is its own stacking context, so a halo bleeding past
+    // the row bottom would otherwise paint under the next row's carpet.
+    &.has-target {
+      z-index: 2;
+    }
+
+    @for $i from 0 through $total-rows - 1 {
+      &:nth-child(even) {
+        // Wall-sconce pools straddling the row ends. Self-contained soft
+        // gradients (no box-shadow bleed), so they render correctly with
+        // the row unclipped instead of depending on overflow: hidden to
+        // trim a hard-edged dot.
+        &:before,
+        &:after {
+          content: '';
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: radial-gradient(closest-side, rgba(243, 229, 171, 0.55), rgba(243, 229, 171, 0));
+          pointer-events: none;
+        }
+
+        &:before {
+          left: -13px;
+        }
+
+        &:after {
+          right: -13px;
+        }
+      }
+    }
+  }
+
+  .seats {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-width: 4rem;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0 0 0.5rem;
+  }
+
+  app-chair {
+    flex: 1 1 auto;
+  }
+
+  .entry {
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex: 0 0 auto; // Does not expand vertically
+    width: 100%; // Same width as rows
+    position: relative;
+
+    .doors {
+      margin-top: auto; /* pushes it to the bottom in a column layout */
+      flex: 0 0 auto;
+      position: relative; /* needed for the ::before/::after absolutely positioned */
+      display: flex; /* can be flex if you want internal content or children, else block is fine */
+      height: 0.6rem;
+      max-height: 0.6rem;
+      width: 70%;
+      background-color: #333;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8);
+
+      &:after,
+      &:before {
+        content: '';
+        position: absolute;
+        top: 20%;
+        height: 80%;
+        width: 15%;
+        background: #ff4444b1;
+        outline: 3px solid #2c2c2c;
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+        border-radius: 0 0 3px 3px;
+      }
+
+      &:before {
+        left: 35%;
+      }
+
+      &:after {
+        right: 35%;
+      }
+    }
+  }
+
+  .paused-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999; /* above seats but below any modals if needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    padding: 1.5rem;
+
+    .paused-marquee {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      max-width: 26rem;
+
+      &__eyebrow {
+        color: #bda661;
+        font-family: 'Space Mono', monospace;
+        font-size: clamp(0.62rem, 1.4vw, 0.75rem);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+
+      &__title {
+        margin: 0;
+        color: #e8bf61;
+        font-family: 'Anton', Impact, sans-serif;
+        font-size: clamp(1.4rem, 3.6vw, 2.2rem);
+        font-weight: 400;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 0 #5e2823;
+      }
+
+      &__hint {
+        margin: 0;
+        color: rgba(245, 230, 200, 0.85);
+        font-family: 'Roboto', Arial, sans-serif;
+        font-size: clamp(0.72rem, 1.7vw, 0.9rem);
+        line-height: 1.45;
+      }
+    }
+  }
+}
+
+// ============================================
+// VELVET SEATS (seatUpgrade concession)
+// Enriches SVG upholstery via CSS filter on the chair wrapper.
+// Deep crimson shift + subtle brightness lift mimics rich red velvet.
+// The gold trim is achieved via a pseudo-element on the seat-wrapper
+// inside the shadow DOM via ::ng-deep (acceptable for a purely cosmetic
+// enrichment that doesn't need to be toggled by the chair itself).
+// ============================================
+
+.seating-area.house-velvet {
+  ::ng-deep app-chair .seat-wrapper {
+    // Warm deep-red velvet shift: saturate + hue toward true crimson
+    filter: saturate(1.35) hue-rotate(-8deg) brightness(1.05);
+
+    // Thin gold trim line along the bottom of each seat wrapper
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0.1rem;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(201, 168, 76, 0.7) 30%,
+        rgba(201, 168, 76, 0.7) 70%,
+        transparent
+      );
+      pointer-events: none;
+      z-index: 5;
+    }
+  }
+}
+
+// ============================================
+// LIGHT MODE (DAY MODE) SUPPORT - Warm Matinee Palette
+// ============================================
+
+:host-context(.day-mode) {
+  .seating-area {
+    // Stairs - Light mode (warm amber lights)
+    .stairs {
+      .lights {
+        &:before,
+        &:after {
+          background-color: #d4ac0d; // Warm amber lights
+          box-shadow: 0 0 10px #d4ac0d;
+        }
+      }
+
+      .hand-rail {
+        background-color: rgba(109, 76, 65, 0.6); // Warm walnut wood
+
+        &:before,
+        &:after {
+          background-color: #d4ac0d;
+          opacity: 0.6;
+        }
+      }
+    }
+
+    // Row carpet - Use bright carpet variant
+    .row {
+      @include carpet-floor-twilight;
+
+      &:nth-child(even) {
+        &:before,
+        &:after {
+          background-color: #d4ac0d; // Warm amber path lights
+          box-shadow: 0 0 10px 10px rgba(212, 172, 13, 0.4);
+        }
+      }
+    }
+
+    // Entry doors - Light mode (warm walnut with burgundy exit signs)
+    .entry {
+      .doors {
+        background-color: rgba(109, 76, 65, 0.55); // Warm walnut wood
+        box-shadow: 0 2px 5px rgba(78, 52, 46, 0.3);
+
+        &:after,
+        &:before {
+          background: rgba(146, 43, 33, 0.8); // Burgundy exit signs matching chairs
+          outline: 3px solid rgba(109, 76, 65, 0.45);
+          box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.18);
+        }
+      }
+    }
+
+    // Paused backdrop - Light mode (warm matinee tones)
+    .paused-backdrop {
+      background-color: rgba(232, 224, 212, 0.94);
+
+      .paused-marquee {
+        &__eyebrow,
+        &__title {
+          color: #72502f;
+        }
+
+        &__title {
+          text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.55);
+        }
+
+        &__hint {
+          color: #4e342e;
+        }
+      }
+    }
+  }
+}

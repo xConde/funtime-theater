@@ -1,0 +1,765 @@
+// ====================================
+// LOBBY RESPONSIVE STYLES
+// ====================================
+@use 'variables' as *;
+@use 'lobby-variables' as *;
+
+// Desktop (> 1200px) - wide layout
+// Note: game-modes-carousel 4-col layout is defined in _play-section.scss
+// at > 768px to match the 720px attract-screen width.
+@media (min-width: $breakpoint-desktop) {
+  .lobby-content {
+    max-width: 1400px;
+    padding: 1.5rem 3%;
+  }
+
+  .shop-section .power-ups-showcase {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: none;
+    width: 100%;
+    gap: $space-xl;
+
+    .power-up-item {
+      padding: $space-xl;
+      min-height: 280px;
+
+      .power-up-visual {
+        width: 88px;
+        height: 88px;
+        margin-bottom: 1rem;
+        flex-shrink: 0;
+
+        .power-icon {
+          font-size: 3.5rem;
+          max-width: 80px;
+          max-height: 80px;
+        }
+      }
+
+      .power-up-details {
+        h4 {
+          font-size: 1.2rem;
+          margin-bottom: 0.5rem;
+          line-height: 1.15;
+        }
+        p {
+          font-size: 0.95rem;
+          line-height: 1.4;
+          -webkit-line-clamp: 3;
+        }
+        .power-up-price {
+          padding: 0.5rem 1.25rem;
+          font-size: 1.1rem;
+          margin-top: 0.75rem;
+
+          .cost {
+            font-size: 1.35rem;
+          }
+        }
+      }
+    }
+  }
+
+  .stats-section {
+    .stats-ticker-container {
+      height: 55px;
+    }
+
+    .achievements-section {
+      padding: $space-lg;
+
+      h3 {
+        font-size: 1.1rem;
+      }
+
+      .achievements-grid {
+        gap: $space-base;
+
+        .achievement-item {
+          padding: $space-base;
+
+          .achievement-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+          }
+          .achievement-info {
+            h4 {
+              font-size: 0.9rem;
+            }
+            p {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Tablet (768px - 1200px) - 3 column grid for shop
+// Note: game-modes-carousel layout at > 768px is defined in _play-section.scss
+// (4-col, max-width 720px, gap 10px) — no overrides needed here.
+@media (max-width: $breakpoint-desktop) {
+  .lobby-content {
+    max-width: 900px;
+    padding: 1.25rem 5%;
+  }
+
+  .shop-section .power-ups-showcase {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 800px;
+    gap: $space-base;
+
+    .power-up-item {
+      padding: $space-base;
+      min-height: 240px;
+
+      .power-up-visual {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 0.6rem;
+
+        .power-icon {
+          font-size: 2.25rem;
+          max-width: 48px;
+          max-height: 48px;
+        }
+      }
+
+      .power-up-details {
+        h4 {
+          font-size: 0.9rem;
+          margin-bottom: 0.35rem;
+        }
+        p {
+          font-size: 0.75rem;
+          line-height: 1.35;
+          -webkit-line-clamp: 3;
+        }
+        .power-up-price {
+          padding: 0.35rem 0.75rem;
+          font-size: 0.9rem;
+
+          .cost {
+            font-size: 1.05rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Narrow tablet adjustments (900px) - shop switches to 2 columns
+// Note: game-modes-carousel stays 4-col (> 768px rule) down to 769px; below
+// that the mobile horizontal-row layout takes over.
+@media (max-width: $breakpoint-wide-tablet) {
+  .lobby-content {
+    max-width: 640px;
+    padding: 1rem 4%;
+  }
+
+  .shop-section .power-ups-showcase {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 560px;
+    gap: $space-md;
+
+    .power-up-item {
+      padding: $space-md;
+      min-height: 220px;
+
+      .power-up-visual {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 0.5rem;
+
+        .power-icon {
+          font-size: 2rem;
+          max-width: 44px;
+          max-height: 44px;
+        }
+      }
+
+      .power-up-details {
+        h4 {
+          font-size: 0.85rem;
+          margin-bottom: 0.3rem;
+        }
+        p {
+          font-size: 0.72rem;
+          line-height: 1.3;
+          -webkit-line-clamp: 3;
+        }
+        .power-up-price {
+          padding: 0.3rem 0.6rem;
+          font-size: 0.85rem;
+
+          .cost {
+            font-size: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .stats-section {
+    padding: $space-md;
+    gap: $space-md;
+
+    .stats-ticker-container {
+      height: 45px;
+
+      .stat-ticker-item {
+        .stat-icon {
+          font-size: 1rem;
+        }
+        .stat-label {
+          font-size: 0.6rem;
+        }
+        .stat-value {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .achievements-section {
+    padding: $space-base;
+
+    h3 {
+      font-size: 0.95rem;
+    }
+    .achievements-grid {
+      gap: $space-sm;
+    }
+  }
+}
+
+// Mobile (< 768px)
+@media (max-width: $breakpoint-mobile) {
+  .theater-header {
+    .theater-title {
+      font-size: 1.25rem;
+      letter-spacing: 0.08em;
+    }
+
+    .marquee-lights {
+      top: -6px;
+
+      .light {
+        width: 6px;
+        height: 6px;
+        box-shadow:
+          0 0 6px rgba(255, 215, 0, 0.5),
+          0 0 12px rgba(255, 215, 0, 0.2);
+      }
+    }
+  }
+
+  .lobby-nav {
+    padding: 0;
+    flex-wrap: wrap;
+    gap: 0;
+
+    // Tabs row - centered, comes first visually
+    .nav-center {
+      order: 1;
+      flex: 1 1 100%;
+      width: 100%;
+      justify-content: center;
+      gap: $space-sm;
+      padding: 0.4rem 4%;
+
+      .nav-tab {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+        letter-spacing: 0.05em;
+        // WCAG 2.5.5: 44×44 minimum touch target on mobile.
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        &.active::after {
+          height: 2px;
+          bottom: -0.6rem;
+        }
+      }
+    }
+
+    // Stats bar - below tabs: a slim status strip framing level (left) and
+    // tickets (right) so it reads as an intentional HUD bar, not an empty row
+    // with the stats jammed against the right edge.
+    .nav-right {
+      order: 2;
+      flex: 1 1 100% !important;
+      width: 100%;
+      display: flex !important;
+      // No justify-content needed: the single child .player-stats is width:100% and
+      // spreads its own children with space-between. (`stretch` is invalid on a flex
+      // container's justify-content anyway and was silently ignored.)
+      margin-left: 0 !important;
+      padding: 0.3rem 4%;
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 215, 0, 0.1);
+      border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+
+      .player-stats {
+        width: 100%;
+        justify-content: space-between;
+        gap: $space-base;
+
+        .level-display {
+          margin-right: 0;
+
+          .level-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            background: rgba(42, 34, 34, 0.8);
+
+            &::before {
+              font-size: 0.7rem;
+              margin-right: 0.2rem;
+            }
+          }
+        }
+
+        .coin-display {
+          font-size: 1.1rem;
+          gap: 0.3rem;
+
+          .ticket-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+          }
+        }
+      }
+    }
+  }
+
+  .lobby-content {
+    padding: 0.75rem 4%;
+    max-width: 100%;
+  }
+
+  .play-section,
+  .shop-section {
+    padding: $space-sm 0;
+  }
+
+  // ── Showtimes board: mobile horizontal-row layout ────────────────────────────
+  // Replaces the 2-column grid. Each card becomes a full-width slim row:
+  // icon (left) | name+tagline (centre, flex-grow) | fee/score+lock (right).
+  // PAUSED badge stays absolutely positioned at the top-right of the row card.
+  // .lobby-container anchor: this partial compiles before styles/play-section,
+  // so the extra class outweighs the base 2-column grid in the cascade.
+  .lobby-container .play-section .game-modes-carousel {
+    display: flex;
+    flex-direction: column;
+    gap: $space-xs;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 $space-xs;
+    box-sizing: border-box;
+
+    .mode-card {
+      // Switch from column-centered to horizontal row
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      text-align: left;
+      min-height: 64px;
+      max-height: none;
+      height: auto;
+      padding: $space-xs $space-sm;
+      gap: $space-sm;
+
+      // Header: icon + text wrapper, grows to fill space between icon and footer
+      .mode-header {
+        flex-direction: row;
+        align-items: center;
+        gap: $space-sm;
+        margin-bottom: 0;
+        flex: 1 1 auto;
+        min-width: 0;
+
+        .mode-icon {
+          font-size: 1.5rem;
+          margin-bottom: 0;
+          filter: drop-shadow(2px 2px 0 #8b4513);
+        }
+      }
+
+      // Text block: grows to fill available space
+      .mode-card__text {
+        align-items: flex-start;
+        flex: 1 1 auto;
+        min-width: 0; // enable text-overflow on children
+
+        h3 {
+          font-size: 0.78rem;
+          text-align: left;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
+        }
+      }
+
+      .mode-description {
+        font-size: 0.62rem;
+        margin: 0.05rem 0 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+        text-align: left;
+        line-height: 1.15;
+      }
+
+      // Footer: pinned right
+      .mode-footer {
+        flex-shrink: 0;
+        margin-top: 0;
+        align-items: center;
+
+        .best-score {
+          font-size: 0.8rem;
+          gap: 0.2rem;
+
+          .trophy-icon {
+            width: 0.85rem;
+            height: 0.85rem;
+          }
+        }
+
+        .lock-indicator {
+          font-size: 0.7rem;
+          gap: 0.2rem;
+
+          i {
+            font-size: 0.8rem;
+          }
+        }
+      }
+
+      // PAUSED badge: keep top-right of the row card
+      .paused-indicator {
+        top: 0.3rem;
+        right: 0.3rem;
+        font-size: 0.55rem;
+        padding: 0.15rem 0.4rem;
+      }
+    }
+  }
+
+  .shop-section .power-ups-showcase {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: min-content;
+    gap: $space-sm;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 $space-sm;
+    box-sizing: border-box;
+
+    .power-up-item {
+      padding: $space-sm $space-xs;
+      aspect-ratio: auto;
+      height: auto;
+      min-height: 0;
+
+      .power-up-visual {
+        width: 36px;
+        height: 36px;
+        margin-bottom: 0.35rem;
+
+        .power-icon {
+          font-size: 1.4rem;
+          max-width: 32px;
+          max-height: 32px;
+        }
+
+        .owned-badge {
+          width: 18px;
+          height: 18px;
+          font-size: 0.6rem;
+          top: -4px;
+          right: -4px;
+        }
+      }
+
+      .power-up-details {
+        h4 {
+          font-size: 0.9rem;
+          margin-bottom: 0.2rem;
+        }
+
+        p {
+          font-size: 0.8rem;
+          margin-bottom: 0.25rem;
+          line-height: 1.25;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .power-up-price {
+          padding: 0.25rem 0.5rem;
+          font-size: 0.85rem;
+          border-radius: 8px;
+          gap: 0.3rem;
+
+          .cost {
+            font-size: 1rem;
+          }
+          i {
+            font-size: 0.7rem;
+          }
+        }
+      }
+
+      &:disabled::after {
+        font-size: 1rem;
+      }
+    }
+  }
+
+  .stats-section {
+    padding: $space-sm 0;
+    gap: $space-sm;
+
+    .stats-ticker-container {
+      height: 38px;
+      margin-bottom: 0.4rem;
+      border: 2px solid #6a5030;
+
+      .stat-ticker-item {
+        padding: 0 0.5rem;
+        gap: 0.35rem;
+
+        .stat-icon {
+          font-size: 0.8rem;
+        }
+        .stat-label {
+          font-size: 0.55rem;
+        }
+        .stat-value {
+          font-size: 0.75rem;
+          margin-left: 0.2rem;
+        }
+      }
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $space-sm;
+
+      .stat-card {
+        padding: $space-sm;
+
+        .stat-icon {
+          font-size: 1.25rem;
+        }
+        .stat-value {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+
+  // Nested achievements-section inside stats-section for mobile
+  .stats-section .achievements-section {
+    padding: $space-sm;
+    border: 2px solid #6a5030;
+
+    h3 {
+      font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .achievements-grid {
+      gap: 0.4rem;
+
+      .achievement-item {
+        padding: 0.5rem;
+        gap: 0.4rem;
+
+        .achievement-icon {
+          width: 20px;
+          height: 20px;
+        }
+
+        .achievement-info {
+          h4 {
+            font-size: 0.7rem;
+          }
+          p {
+            font-size: 0.6rem;
+          }
+
+          .achievement-progress {
+            margin-top: 0.3rem;
+
+            .progress-bar {
+              height: 3px;
+            }
+            .progress-text {
+              font-size: 0.6rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Small mobile (< 480px)
+@media (max-width: $breakpoint-small-mobile) {
+  .theater-header .theater-title {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+  }
+
+  .lobby-nav {
+    .nav-center {
+      padding: 0.4rem 3%;
+      gap: $space-xs;
+
+      .nav-tab {
+        font-size: 0.65rem;
+        padding: 0.35rem 0.5rem;
+        letter-spacing: 0.03em;
+        // WCAG 2.5.5: 44×44 minimum touch target preserved at the
+        // smallest breakpoint — text shrinks but the tap surface
+        // doesn't go below floor.
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    .nav-right {
+      padding: $space-xs 3%;
+
+      .player-stats {
+        gap: $space-sm;
+
+        .level-display .level-badge {
+          font-size: 0.6rem;
+          padding: 0.2rem 0.4rem;
+        }
+
+        .coin-display {
+          font-size: 1rem;
+
+          .ticket-icon {
+            width: 1rem;
+            height: 1rem;
+          }
+        }
+      }
+    }
+  }
+
+  .lobby-content {
+    padding: 0.5rem 3%;
+  }
+
+  // Small mobile: slightly tighten the horizontal-row card sizing
+  .lobby-container .play-section .game-modes-carousel {
+    gap: 3px;
+    padding: 0 2px;
+
+    .mode-card {
+      padding: $space-xs $space-xs;
+      min-height: 56px;
+
+      .mode-header .mode-icon {
+        font-size: 1.25rem;
+      }
+
+      .mode-card__text h3 {
+        font-size: 0.7rem;
+      }
+
+      .mode-description {
+        font-size: 0.58rem;
+      }
+
+      .mode-footer {
+        .best-score {
+          font-size: 0.72rem;
+          gap: 0.15rem;
+
+          .trophy-icon {
+            width: 0.75rem;
+            height: 0.75rem;
+          }
+        }
+        .lock-indicator {
+          font-size: 0.65rem;
+        }
+      }
+    }
+  }
+
+  .shop-section .power-ups-showcase {
+    gap: $space-xs;
+    padding: 0 $space-xs;
+
+    .power-up-item {
+      padding: $space-xs;
+
+      .power-up-visual {
+        width: 32px;
+        height: 32px;
+      }
+
+      .power-up-details {
+        h4 {
+          font-size: 0.85rem;
+        }
+        p {
+          font-size: 0.75rem;
+          -webkit-line-clamp: 2;
+        }
+        .power-up-price {
+          padding: 0.2rem 0.4rem;
+          .cost {
+            font-size: 0.95rem;
+          }
+        }
+      }
+
+      &:disabled::after {
+        font-size: 0.95rem;
+      }
+    }
+  }
+
+  .stats-section .achievements-section {
+    padding: $space-xs;
+
+    h3 {
+      font-size: 0.7rem;
+    }
+
+    .achievements-grid .achievement-item {
+      padding: 0.35rem;
+
+      .achievement-icon {
+        width: 18px;
+        height: 18px;
+      }
+      .achievement-info {
+        h4 {
+          font-size: 0.6rem;
+        }
+        p {
+          font-size: 0.5rem;
+        }
+      }
+    }
+  }
+}

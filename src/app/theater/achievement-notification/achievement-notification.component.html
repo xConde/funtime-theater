@@ -1,0 +1,29 @@
+@if (achievement) {
+  <div class="achievement-notification" [@slideIn] role="status" aria-live="polite" (mouseenter)="dismissAchievement()">
+    <div class="notification-content">
+      <div class="notification-header">
+        <span class="hud-icon" [innerHTML]="iconService.getIconHtml('trophy')" aria-hidden="true"></span>
+        <span>Achievement Unlocked!</span>
+      </div>
+      <div class="notification-body">
+        <span
+          class="achievement-icon"
+          [innerHTML]="iconService.getIconHtml(achievement.icon)"
+          aria-hidden="true"
+        ></span>
+        <div class="achievement-details">
+          <h3>{{ achievement.name }}</h3>
+          <p>{{ achievement.description }}</p>
+        </div>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="notification-dismiss"
+      (click)="dismissAchievement()"
+      aria-label="Dismiss achievement notification"
+    >
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+}

@@ -1,0 +1,245 @@
+// ====================================
+// FILM LAYER - Behind HUD, above idle
+// ====================================
+// The film layer sits at z-index 1, below all HUD elements (z-index 10+).
+// It reads --film-intensity (0..1) and --film-tint for genre colour.
+// All keyframe animations are disabled via prefers-reduced-motion.
+
+.film-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+
+  // Genre tint surface — faint wash behind everything.
+  background-color: var(--film-tint, transparent);
+}
+
+// ---------------------------------------------------------------------------
+// Projection canvas — the actual movie. Low internal resolution scaled up;
+// pixelated rendering reads as period projection and keeps fill cost tiny.
+// ---------------------------------------------------------------------------
+.film-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  // The buffer is sized to the panel's aspect ratio (ScreenComponent), so for
+  // the supported range the canvas already matches the box and cover is a
+  // no-op — the full frame, countdown leader included, is always in view.
+  // cover + centered anchor stay as the graceful fallback for panels outside
+  // the clamp range (very narrow phones, ultra-wide monitors), and still kill
+  // the old wide-screen stretch distortion.
+  object-fit: cover;
+  object-position: center center;
+  opacity: 0.92;
+}
+
+// ---------------------------------------------------------------------------
+// Intensity glow — single element, CSS-only, no JS per frame.
+// ---------------------------------------------------------------------------
+.film-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: var(--film-intensity, 0);
+  box-shadow: inset 0 0 60px rgba(255, 200, 100, 0.35);
+  transition:
+    opacity 1s ease,
+    box-shadow 1s ease;
+  pointer-events: none;
+}
+
+// Flicker overlay driven by intensity.
+// Base element has no animation; the infinite steps(1) animation activates
+// only when .flicker-active is present (intensity > 0.4 per isFlickerActive()).
+.film-flicker {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 230, 150, 0.06);
+  opacity: calc(var(--film-intensity, 0) * 0.15);
+  pointer-events: none;
+
+  &.flicker-active {
+    animation: filmFlicker 0.18s steps(1) infinite;
+  }
+}
+
+@keyframes filmFlicker {
+  0%,
+  100% {
+    opacity: calc(var(--film-intensity, 0) * 0.15);
+  }
+  33% {
+    opacity: calc(var(--film-intensity, 0) * 0.05);
+  }
+  66% {
+    opacity: calc(var(--film-intensity, 0) * 0.2);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Title card
+// ---------------------------------------------------------------------------
+.film-title-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  text-align: center;
+  gap: 0.5rem;
+
+  .film-title-text {
+    font-family: 'Arial Black', 'Bebas Neue', Impact, sans-serif;
+    font-size: clamp(1.4rem, 4vw, 3rem);
+    letter-spacing: 0.08em;
+    color: #f5e6c8;
+    text-shadow:
+      0 0 12px rgba(245, 230, 200, 0.5),
+      2px 2px 0 rgba(0, 0, 0, 0.8);
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .film-starring-line {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+    color: rgba(245, 230, 200, 0.7);
+    font-style: italic;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .film-year {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    color: rgba(245, 230, 200, 0.45);
+    letter-spacing: 0.2em;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Caption strip (body beats)
+// ---------------------------------------------------------------------------
+.film-caption {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  text-align: center;
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 2px;
+
+  .film-caption-text {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+    font-style: italic;
+    color: rgba(245, 230, 200, 0.85);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Feature number badge
+// ---------------------------------------------------------------------------
+.film-feature-badge {
+  position: absolute;
+  top: 3.5rem;
+  right: 0.75rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(245, 230, 200, 0.3);
+  border-radius: 2px;
+  padding: 0.15rem 0.45rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(0.5rem, 1vw, 0.65rem);
+  font-style: italic;
+  color: rgba(245, 230, 200, 0.65);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+// ---------------------------------------------------------------------------
+// Credits roll
+// ---------------------------------------------------------------------------
+.film-credits {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 15%;
+  overflow: hidden;
+
+  .film-the-end {
+    font-family: 'Arial Black', 'Bebas Neue', Impact, sans-serif;
+    font-size: clamp(1.6rem, 5vw, 3.5rem);
+    letter-spacing: 0.25em;
+    color: #f5e6c8;
+    text-shadow:
+      0 0 20px rgba(245, 230, 200, 0.4),
+      2px 2px 0 rgba(0, 0, 0, 0.9);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+  }
+
+  .film-credits-scroll {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    animation: creditsRoll 5s linear forwards;
+
+    .film-credits-line {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: clamp(0.55rem, 1.2vw, 0.7rem);
+      color: rgba(245, 230, 200, 0.65);
+      font-style: italic;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+
+      &.credit-title {
+        font-style: normal;
+        font-weight: bold;
+        color: rgba(245, 230, 200, 0.85);
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+      }
+    }
+  }
+}
+
+@keyframes creditsRoll {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    // Use percentage so the scroll distance scales with content height rather
+    // than a fixed pixel offset.
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Reduced motion: no animation, no flicker.
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .film-flicker.flicker-active,
+  .film-credits-scroll {
+    animation: none !important;
+  }
+}

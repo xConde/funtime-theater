@@ -1,0 +1,80 @@
+@if (showHouse()) {
+  <div
+    class="patron-house"
+    [class.is-settling]="isSettling()"
+    [attr.data-reaction]="houseReaction()"
+    aria-hidden="true"
+  >
+    @for (row of seatsData(); track trackRow($index, row); let rowIndex = $index) {
+      @let perspective = rowPerspective(rowIndex);
+      <div class="p-row" [style.transform]="perspective.transform" [style.flex-grow]="perspective.flexGrow">
+        <div class="p-seats left">
+          @for (seat of row.leftSeats; track trackSeat($index, seat)) {
+            <div class="p-slot">
+              @if (occupied(seat)) {
+                @let style = patronStyle(seat);
+                <div
+                  class="patron"
+                  [class.has-phone]="hasPhone(seat)"
+                  [class.is-active]="isActiveSeat(seat)"
+                  [attr.data-wear]="style.wear"
+                  [attr.data-build]="style.build"
+                  [attr.data-posture]="style.posture"
+                  [style.--skin-color]="style.skinColor"
+                  [style.--coat-color]="style.coatColor"
+                  [style.--wear-color]="style.wearColor"
+                  [style.--p-size]="style.size"
+                  [style.--p-head-w]="style.headWidth"
+                  [style.animation-delay.ms]="delayMs(seat)"
+                >
+                  <span class="patron-figure">
+                    <span class="patron-shoulders"></span>
+                    <span class="patron-neck"></span>
+                    <span class="patron-head"></span>
+                  </span>
+                  @if (hasPhone(seat)) {
+                    <span class="patron-phone"></span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+        <div class="p-stairs" [style.width]="perspective.aisleWidth"></div>
+        <div class="p-seats right">
+          @for (seat of row.rightSeats; track trackSeat($index, seat)) {
+            <div class="p-slot">
+              @if (occupied(seat)) {
+                @let style = patronStyle(seat);
+                <div
+                  class="patron"
+                  [class.has-phone]="hasPhone(seat)"
+                  [class.is-active]="isActiveSeat(seat)"
+                  [attr.data-wear]="style.wear"
+                  [attr.data-build]="style.build"
+                  [attr.data-posture]="style.posture"
+                  [style.--skin-color]="style.skinColor"
+                  [style.--coat-color]="style.coatColor"
+                  [style.--wear-color]="style.wearColor"
+                  [style.--p-size]="style.size"
+                  [style.--p-head-w]="style.headWidth"
+                  [style.animation-delay.ms]="delayMs(seat)"
+                >
+                  <span class="patron-figure">
+                    <span class="patron-shoulders"></span>
+                    <span class="patron-neck"></span>
+                    <span class="patron-head"></span>
+                  </span>
+                  @if (hasPhone(seat)) {
+                    <span class="patron-phone"></span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+    <div class="p-entry"></div>
+  </div>
+}

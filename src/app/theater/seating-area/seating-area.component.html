@@ -1,0 +1,72 @@
+<div
+  class="seating-area"
+  [class.house-velvet]="isVelvetActive()"
+  (mouseleave)="clearHover()"
+  (click)="handleAreaClick()"
+  role="group"
+  aria-label="Theater seating"
+  aria-describedby="theater-seat-instructions"
+>
+  <p id="theater-seat-instructions" class="sr-only">
+    Use the arrow keys to move between seats. Press Enter or Space to choose the lit seat.
+  </p>
+  @for (row of seatsData; track trackByRow($index, row); let rowIndex = $index) {
+    @let perspective = rowPerspective(rowIndex);
+    <div
+      class="row"
+      [style.transform]="perspective.transform"
+      [style.flex-grow]="perspective.flexGrow"
+      [class.has-target]="rowHasTarget(rowIndex)"
+    >
+      <div class="seats left">
+        @for (seat of row.leftSeats; track trackBySeat($index, seat)) {
+          <app-chair
+            [seat]="seat"
+            [totalRows]="totalRows"
+            [seatsPerRow]="seatsPerRow"
+            [isActive]="isActiveSeat(seat.side, rowIndex, seat.seatIndex)"
+            [isTabStop]="isKeyboardSeat(seat)"
+            (activity)="handleSeatEvent($event)"
+            (seatFocused)="handleSeatFocus($event)"
+            (navigate)="moveKeyboardFocus($event.seat, $event.direction)"
+          >
+          </app-chair>
+        }
+      </div>
+      <div class="stairs" [style.width]="perspective.aisleWidth">
+        <div class="lights"></div>
+        <div class="hand-rail"></div>
+      </div>
+      <div class="seats right">
+        @for (seat of row.rightSeats; track trackBySeat($index, seat)) {
+          <app-chair
+            [seat]="seat"
+            [totalRows]="totalRows"
+            [seatsPerRow]="seatsPerRow"
+            [leftSeatsLength]="row.leftSeats.length"
+            [isActive]="isActiveSeat(seat.side, rowIndex, seat.seatIndex)"
+            [isTabStop]="isKeyboardSeat(seat)"
+            (activity)="handleSeatEvent($event)"
+            (seatFocused)="handleSeatFocus($event)"
+            (navigate)="moveKeyboardFocus($event.seat, $event.direction)"
+          >
+          </app-chair>
+        }
+      </div>
+    </div>
+  }
+  <div class="entry">
+    <div class="doors"></div>
+  </div>
+  @if (paused) {
+    <div class="paused-backdrop" role="status" aria-live="polite" aria-atomic="true">
+      <div class="paused-marquee">
+        <span class="paused-marquee__eyebrow">Intermission</span>
+        <h2 class="paused-marquee__title">The Reel Is Paused</h2>
+        <p class="paused-marquee__hint">Click or press any key to resume. Head to LOBBY to step away.</p>
+      </div>
+    </div>
+  }
+  <app-patron-layer [paused]="paused" />
+  <app-staff-layer />
+</div>

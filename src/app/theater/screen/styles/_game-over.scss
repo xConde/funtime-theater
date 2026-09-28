@@ -1,0 +1,115 @@
+// ====================================
+// GAME OVER SCREEN - Compact Layout
+// ====================================
+
+.game-over {
+  position: relative;
+  text-align: center;
+  font-family: 'Uncial Antiqua';
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  max-width: 90%;
+  z-index: 10;
+
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    color: #fff;
+  }
+
+  .new-high-score {
+    margin: 0 0 0.4rem;
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(0.68rem, 2vw, 0.85rem);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+
+    .hud-icon {
+      width: 0.9em;
+      height: 0.9em;
+      flex-shrink: 0;
+    }
+  }
+
+  .final-score {
+    margin: 0;
+    font-size: clamp(1.5rem, 5vw, 2.25rem);
+    color: #ffd700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    .hud-icon {
+      width: 0.85em;
+      height: 0.85em;
+      flex-shrink: 0;
+    }
+
+    .earned {
+      font-size: 0.6em;
+      color: rgba(255, 215, 0, 0.7);
+      margin-left: 0.25rem;
+    }
+  }
+
+  .applause-line {
+    margin: 0.4rem 0 0;
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    color: rgba(245, 230, 200, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+
+    .hud-icon {
+      width: 0.85em;
+      height: 0.85em;
+      flex-shrink: 0;
+      color: rgba(255, 210, 90, 0.85);
+    }
+  }
+}
+
+// Seat highlighting improvements
+.screen.game-active {
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+    pointer-events: none;
+    animation: spotlightPulse 2s ease-in-out infinite;
+    z-index: 5;
+  }
+}
+
+@keyframes spotlightPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.game-active::before {
+    animation: none !important;
+  }
+}

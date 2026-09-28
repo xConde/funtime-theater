@@ -1,0 +1,112 @@
+// ====================================
+// LOBBY COMPONENT - Main Entry Point
+// ====================================
+// This file imports all modular stylesheets.
+// Individual styles are organized in the styles/ directory.
+
+// External dependencies
+@use 'variables' as *;
+@use 'lobby-variables' as *;
+@use 'animations';
+@use 'responsive';
+@use 'theming';
+
+// Component styles (order matters for cascade)
+@use 'styles/base';
+@use 'styles/header';
+@use 'styles/navigation';
+@use 'styles/play-section';
+@use 'styles/mode-card';
+@use 'styles/shop-section';
+@use 'styles/stats-section';
+@use 'styles/achievements';
+// Final physical-program/menu/ledger treatment and compact-screen type scale;
+// kept last so it can retire earlier card constraints without rewriting them.
+@use 'styles/editorial-pass';
+
+// =============================================================================
+// MOBILE SINGLE-SCROLL + FILL PASS (Jun 2026)
+// =============================================================================
+// The desktop lobby nests fixed-height `overflow:hidden` panels, each with its
+// own inner scrollbox, inside a tall container. On a phone that produced: the
+// Concessions list clipped to ~1.5 of 8 upgrade cards, the awards list trapped
+// in a short window, the active-tab underline buried under the wrapped stats
+// row, and top-heavy tabs with a black band beneath.
+//
+// This block lives after every @use so it reliably wins the cascade: the
+// `responsive` partial is @use'd *before* the base partials, so equal-specificity
+// overrides placed in it are dead (base wins on source order). Putting the
+// structural mobile fixes here lets the lobby scroll as one column to the footer.
+@media (max-width: $breakpoint-mobile) {
+  // Let tab content grow and the .lobby-wrapper own the single scroll, instead
+  // of each section being a fixed-height clipped panel with a nested scrollbox.
+  .shop-section,
+  .stats-section {
+    height: auto;
+    overflow: visible;
+  }
+
+  // Concessions: one readable column; all 8 upgrades reachable via page scroll.
+  .shop-section .power-ups-showcase {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+
+  // Box Office: awards list flows in the page scroll instead of a short window.
+  .stats-section .achievements-section,
+  .stats-section .achievements-section .achievements-grid {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    flex: 0 0 auto;
+  }
+
+  // Now Showing is now a full program with four rows and a confirmation block.
+  // Start at the top so tall mobile content scrolls downward instead of flex-
+  // centering itself behind the wrapped navigation.
+  .play-section {
+    justify-content: flex-start;
+  }
+
+  // Active-tab underline: keep it flush at the tab's bottom inside .nav-center,
+  // not -0.75rem down into the wrapped stats row where its background buried it.
+  // Also soften the 2px hard text-shadow that ghosted the label at small sizes.
+  .lobby-nav .nav-center .nav-tab.active {
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.18);
+
+    &::after {
+      bottom: 0;
+    }
+  }
+
+  // Mode cards: horizontal-row layout on mobile — 64px min-height per row.
+  // The old 160px column-card floor is retired; horizontal rows are self-sizing
+  // by content and need only a comfortable touch-target floor.
+  .play-section .game-modes-carousel .mode-card {
+    min-height: 64px;
+  }
+
+  // Stats ticker: 3rem inter-item gap is desktop-scaled; tighten so more of the
+  // ticker reads at once on a narrow screen.
+  .stats-section .stat-ticker-content {
+    gap: 1.5rem;
+  }
+}
+
+// Touch devices have no pointer-leave, so the mode-card / shop-card hover lift +
+// rotate transforms STICK after a tap, leaving the card skewed. Neutralize the
+// transforms (not the color/shadow feedback) where hover isn't real.
+@media (hover: none) {
+  .mode-card:not(.locked):hover,
+  .power-up-item:hover:not(:disabled) {
+    transform: none;
+  }
+
+  .mode-card:not(.locked):hover .mode-icon,
+  .power-up-item:hover:not(:disabled) .power-up-visual {
+    transform: none;
+  }
+}

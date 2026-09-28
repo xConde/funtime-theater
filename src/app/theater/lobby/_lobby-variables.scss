@@ -1,0 +1,124 @@
+// ====================================
+// LOBBY VARIABLES & MIXINS
+// Extends the base design system with lobby-specific utilities
+// ====================================
+
+@use '../styles/design-system' as ds;
+
+// Re-export design system tokens for backward compatibility
+// This allows existing imports to continue working during migration
+
+// Colors (forwarded from design system)
+$color-gold: ds.$color-gold;
+$color-gold-light: ds.$color-gold-60;
+$color-gold-lighter: ds.$color-gold-30;
+$color-gold-faint: ds.$color-gold-10;
+$color-green: ds.$color-success;
+$color-green-light: rgba(0, 214, 50, 0.3);
+$color-white-light: rgba(255, 255, 255, 0.1);
+$color-white-faint: rgba(255, 255, 255, 0.05);
+
+// Animation durations (forwarded from design system)
+$anim-fast: ds.$animation-fast;
+$anim-normal: ds.$animation-standard;
+$anim-slow: ds.$animation-slow;
+$anim-loop: ds.$animation-loop;
+$anim-loop-slow: ds.$animation-loop-slow;
+
+// Spacing (forwarded from design system - now 4px grid based)
+$space-xs: ds.$spacing-micro; // 4px
+$space-sm: ds.$spacing-tight; // 8px
+$space-md: ds.$spacing-standard; // 12px
+$space-base: ds.$spacing-comfortable; // 16px
+$space-lg: ds.$spacing-generous; // 24px
+$space-xl: ds.$spacing-major; // 32px
+
+// Responsive breakpoints (forwarded from design system)
+$breakpoint-desktop: ds.$breakpoint-desktop;
+$breakpoint-wide-tablet: ds.$breakpoint-tablet;
+$breakpoint-mobile: ds.$breakpoint-mobile;
+$breakpoint-small-mobile: ds.$breakpoint-small-mobile;
+
+// ====================================
+// MIXINS - Forwarded from design system
+// ====================================
+
+// Common box shadows
+@mixin vintage-shadow {
+  @include ds.depth-shadow-card;
+}
+
+@mixin vintage-shadow-hover {
+  @include ds.depth-shadow-card-hover;
+}
+
+// Common text shadows
+@mixin gold-text-shadow {
+  @include ds.text-shadow-gold;
+}
+
+@mixin gold-text-shadow-large {
+  @include ds.text-shadow-gold-large;
+}
+
+// Common transitions
+@mixin card-transition {
+  transition: all ds.$animation-medium ds.$easing-bounce;
+}
+
+// Vintage gradient animation (lobby-specific)
+@mixin vintage-gradient-bg {
+  &::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    background: linear-gradient(45deg, ds.$color-gold, ds.$color-brown, ds.$color-gold, ds.$color-brown);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity ds.$animation-medium ease;
+    background-size: 400% 400%;
+    animation: vintage-gradient 8s ease infinite;
+    border-radius: inherit;
+  }
+}
+
+// Card styles
+@mixin vintage-card {
+  @include ds.card-vintage;
+}
+
+// Flex layouts (forwarded from design system)
+@mixin flex-center {
+  @include ds.flex-center;
+}
+
+@mixin flex-column {
+  @include ds.flex-column;
+}
+
+@mixin flex-between {
+  @include ds.flex-between;
+}
+
+// Common grid patterns
+@mixin grid-responsive($desktop: 4, $tablet: 3, $mobile: 2) {
+  @include ds.grid-responsive($mobile, $tablet, $desktop);
+}
+
+// Common section styles
+@mixin section-base {
+  padding: ds.$spacing-tight;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+// Item hover effects
+@mixin item-hover {
+  &:hover {
+    @include ds.card-vintage-hover;
+  }
+}
