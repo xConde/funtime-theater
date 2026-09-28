@@ -19,4 +19,4 @@ npm start
 
 ## License
 
-Application code is [MIT licensed](LICENSE). Bundled fonts have their own licenses beside the font files in `public/assets/fonts`. Font Awesome is installed through npm under its own license.
+Application code is [MIT licensed](LICENSE). Bundled fonts have their own licenses beside the font files in `public/assets/fonts`. Font Awesome is installed through npm under its own license. Inline icon paths are covered by the [Phosphor Icons license](third_party/PHOSPHOR-LICENSE).
